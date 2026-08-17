@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Neon Dodge</title>
+<style>
+body{margin:0;background:#101020;color:white;font-family:Arial;text-align:center}
+canvas{display:block;margin:20px auto;background:#171735;border:2px solid #55ffff}
+</style></head><body>
+<h1>Neon Dodge</h1><p>Move with ← → and dodge the falling blocks.</p>
+<canvas id="c" width="700" height="450"></canvas>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d');let p={x:330,y:400,w:40,h:22},keys={},obs=[],score=0,over=false;
+onkeydown=e=>keys[e.key]=1;onkeyup=e=>keys[e.key]=0;
+function loop(){x.clearRect(0,0,700,450);
+if(!over){
+ if(keys.ArrowLeft)p.x-=7;if(keys.ArrowRight)p.x+=7;p.x=Math.max(0,Math.min(660,p.x));
+ if(Math.random()<.035)obs.push({x:Math.random()*660,y:-30,w:30+Math.random()*35,h:25,v:3+Math.random()*3});
+ obs.forEach(o=>o.y+=o.v);obs=obs.filter(o=>o.y<470);score++;
+ obs.forEach(o=>{if(p.x<o.x+o.w&&p.x+p.w>o.x&&p.y<o.y+o.h&&p.y+p.h>o.y)over=true});
+ x.fillStyle="#55ffff";x.fillRect(p.x,p.y,p.w,p.h);x.fillStyle="#ff4d8d";obs.forEach(o=>x.fillRect(o.x,o.y,o.w,o.h));
+ x.fillStyle="white";x.fillText("Score: "+Math.floor(score/10),15,25);
+}else{x.fillStyle="white";x.font="36px Arial";x.fillText("GAME OVER",250,210);x.font="18px Arial";x.fillText("Press R to restart",270,250)}
+requestAnimationFrame(loop)}
+onkeydown=e=>{keys[e.key]=1;if(e.key.toLowerCase()=="r"&&over){obs=[];score=0;over=false}};
+loop();
+</script></body></html>

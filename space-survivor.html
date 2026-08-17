@@ -1,0 +1,17 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Space Survivor</title>
+<style>body{margin:0;background:#050510;color:white;text-align:center;font-family:Arial}canvas{display:block;margin:15px auto;border:2px solid #777;background:#000}</style></head>
+<body><h1>Space Survivor</h1><p>Move with arrow keys. Survive as long as possible.</p><canvas id="c" width="700" height="450"></canvas>
+<script>
+const c=document.getElementById("c"),g=c.getContext("2d");let p={x:340,y:220},stars=[],t=0,dead=0,k={};
+onkeydown=e=>k[e.key]=1;onkeyup=e=>k[e.key]=0;
+for(let i=0;i<90;i++)stars.push({x:Math.random()*700,y:Math.random()*450,s:1+Math.random()*2});
+function loop(){g.fillStyle="#000";g.fillRect(0,0,700,450);
+stars.forEach(s=>{s.y+=s.s;if(s.y>450)s.y=0;g.fillStyle="white";g.fillRect(s.x,s.y,s.s,s.s)});
+if(!dead){if(k.ArrowLeft)p.x-=5;if(k.ArrowRight)p.x+=5;if(k.ArrowUp)p.y-=5;if(k.ArrowDown)p.y+=5;p.x=Math.max(15,Math.min(685,p.x));p.y=Math.max(15,Math.min(435,p.y));
+if(Math.random()<.018)stars.push({x:Math.random()*700,y:-10,s:4+Math.random()*3,enemy:1});
+stars.forEach(s=>{if(s.enemy&&Math.hypot(s.x-p.x,s.y-p.y)<16)dead=1});
+g.fillStyle="#66ccff";g.beginPath();g.moveTo(p.x,p.y-15);g.lineTo(p.x-12,p.y+12);g.lineTo(p.x,p.y+7);g.lineTo(p.x+12,p.y+12);g.closePath();g.fill();
+g.fillStyle="white";g.fillText("Time: "+Math.floor(t/60),15,25);t++}else{g.font="38px Arial";g.fillText("SHIP DESTROYED",220,220);g.font="18px Arial";g.fillText("Refresh to try again",270,255)}
+requestAnimationFrame(loop)}loop();
+</script></body></html>

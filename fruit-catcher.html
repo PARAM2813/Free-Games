@@ -1,0 +1,19 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Fruit Catcher</title>
+<style>body{margin:0;background:#fff4d6;font-family:Arial;text-align:center}canvas{display:block;margin:15px auto;border:3px solid #333;background:#dff6ff}</style></head>
+<body><h1>Fruit Catcher</h1><p>Move with A/D or ←/→. Catch fruit, avoid bombs.</p><canvas id="c" width="700" height="450"></canvas>
+<script>
+const c=document.getElementById("c"),g=c.getContext("2d");let basket={x:310,y:400,w:80,h:25},items=[],score=0,lives=3,keys={};
+onkeydown=e=>keys[e.key]=1;onkeyup=e=>keys[e.key]=0;
+function draw(){g.clearRect(0,0,700,450);
+if(keys.ArrowLeft||keys.a)basket.x-=7;if(keys.ArrowRight||keys.d)basket.x+=7;basket.x=Math.max(0,Math.min(620,basket.x));
+if(Math.random()<.025)items.push({x:Math.random()*670,y:-20,r:12,v:2+Math.random()*3,b:Math.random()<.12});
+items.forEach(i=>i.y+=i.v);
+items.forEach(i=>{if(i.y+i.r>basket.y&&i.y-i.r<basket.y+basket.h&&i.x>basket.x&&i.x<basket.x+basket.w){i.hit=1;i.b?lives--:score+=10}});
+items=items.filter(i=>!i.hit&&i.y<470);
+g.fillStyle="#8b5a2b";g.fillRect(basket.x,basket.y,basket.w,basket.h);
+items.forEach(i=>{g.beginPath();g.arc(i.x,i.y,i.r,0,7);g.fillStyle=i.b?"#222":"#ff4d4d";g.fill()});
+g.fillStyle="#222";g.fillText("Score: "+score+"   Lives: "+lives,15,25);
+if(lives<=0){g.font="38px Arial";g.fillText("GAME OVER",245,220);g.font="18px Arial";g.fillText("Refresh to play again",270,255);return}
+requestAnimationFrame(draw)}draw();
+</script></body></html>
