@@ -2,149 +2,1606 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GameZone</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#070b14;color:#fff}
-header{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:16px 25px;background:#0b1120ee;backdrop-filter:blur(12px);border-bottom:1px solid #ffffff15}
-.logo{font-size:26px;font-weight:900}.logo span{color:#60a5fa}nav{display:flex;gap:8px}
-button{border:0;border-radius:10px;padding:11px 16px;color:#fff;font-weight:bold;cursor:pointer}.blue{background:#2563eb}.purple{background:#7c3aed}.green{background:#059669}.red{background:#dc2626}.gray{background:#475569}
-.hero{text-align:center;padding:65px 20px 30px}.hero h1{font-size:clamp(45px,8vw,80px);margin:0;background:linear-gradient(90deg,#60a5fa,#a78bfa,#34d399);color:transparent;background-clip:text}.hero p{color:#94a3b8;font-size:18px}
-.search{max-width:700px;margin:0 auto 35px;padding:0 20px}.search input{width:100%;padding:16px;border-radius:14px;border:1px solid #ffffff15;background:#111827;color:white;font-size:16px;outline:none}
-.container{max-width:1200px;margin:auto;padding:0 25px 70px}.heading{display:flex;justify-content:space-between;align-items:center}.count{color:#64748b}
-.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px}.game{overflow:hidden;border-radius:17px;background:#101827;border:1px solid #ffffff10;transition:.2s}.game:hover{transform:translateY(-5px);border-color:#60a5fa66}
-.game-image{height:175px;background:#020617;cursor:pointer}.game-image img{width:100%;height:100%;object-fit:cover}.info{padding:15px}.name{font-size:18px;font-weight:900;cursor:pointer}.by{margin-top:6px;color:#64748b;font-size:12px}
-.empty{display:none;text-align:center;padding:70px;color:#64748b;border:1px dashed #ffffff20;border-radius:15px}.status{text-align:center;margin:15px;color:#34d399;min-height:20px}
-.modal{display:none;position:fixed;inset:0;z-index:100;align-items:center;justify-content:center;background:#000c;padding:20px}.box{width:min(500px,100%);max-height:90vh;overflow:auto;padding:27px;border-radius:20px;background:#101827;border:1px solid #ffffff18}.box h2{margin-top:0}
-.field{margin:15px 0}.field label{display:block;font-weight:bold;margin-bottom:7px}.field input{width:100%;padding:13px;border-radius:10px;border:1px solid #334155;background:#020617;color:white}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:20px}.admin-game{background:#020617;padding:13px;margin-top:10px;border-radius:10px}.admin-game small{display:block;color:#64748b;margin-top:5px}
-@media(max-width:600px){header{padding:13px}.logo{font-size:20px}.games{grid-template-columns:repeat(2,1fr);gap:11px}.game-image{height:125px}.info{padding:11px}.name{font-size:14px}nav button{padding:8px 10px;font-size:12px}}
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#070b14;
+    color:white;
+}
+
+header{
+    padding:15px 25px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0d1424;
+    position:sticky;
+    top:0;
+    z-index:10;
+}
+
+.logo{
+    font-size:25px;
+    font-weight:bold;
+}
+
+.logo span{
+    color:#60a5fa;
+}
+
+button{
+    border:0;
+    border-radius:9px;
+    padding:11px 15px;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.blue{background:#2563eb}
+.green{background:#059669}
+.purple{background:#7c3aed}
+.red{background:#dc2626}
+.gray{background:#475569}
+
+.hero{
+    text-align:center;
+    padding:65px 20px 35px;
+}
+
+.hero h1{
+    font-size:clamp(45px,8vw,80px);
+    margin:0;
+    background:linear-gradient(90deg,#60a5fa,#a78bfa,#34d399);
+    color:transparent;
+    background-clip:text;
+}
+
+.hero p{
+    color:#94a3b8;
+}
+
+.search{
+    max-width:700px;
+    margin:auto;
+    padding:0 20px 35px;
+}
+
+.search input,
+.field input{
+    width:100%;
+    padding:13px;
+    border-radius:10px;
+    border:1px solid #334155;
+    background:#020617;
+    color:white;
+    font-size:15px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+    padding:0 22px 60px;
+}
+
+.heading{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.count{
+    color:#64748b;
+}
+
+.games{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+    gap:18px;
+}
+
+.game{
+    background:#111827;
+    border:1px solid #ffffff12;
+    border-radius:16px;
+    overflow:hidden;
+    transition:.2s;
+}
+
+.game:hover{
+    transform:translateY(-5px);
+}
+
+.game-picture{
+    height:170px;
+    background:#020617;
+    cursor:pointer;
+}
+
+.game-picture img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.game-info{
+    padding:14px;
+}
+
+.game-name{
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.added-by{
+    color:#64748b;
+    font-size:12px;
+    margin-top:6px;
+}
+
+.empty{
+    text-align:center;
+    padding:60px;
+    color:#64748b;
+    border:1px dashed #334155;
+    border-radius:15px;
+}
+
+.status{
+    text-align:center;
+    color:#34d399;
+    min-height:20px;
+}
+
+.modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:#000c;
+    z-index:100;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.modal-box{
+    width:min(520px,100%);
+    max-height:90vh;
+    overflow:auto;
+    background:#111827;
+    padding:25px;
+    border-radius:18px;
+}
+
+.field{
+    margin:15px 0;
+}
+
+.field label{
+    display:block;
+    margin-bottom:7px;
+    font-weight:bold;
+}
+
+.mode-buttons{
+    display:flex;
+    gap:10px;
+    margin:15px 0;
+}
+
+.mode-button{
+    flex:1;
+    background:#1e293b;
+}
+
+.mode-button.selected{
+    background:#2563eb;
+}
+
+.actions{
+    display:flex;
+    gap:9px;
+    flex-wrap:wrap;
+    margin-top:20px;
+}
+
+.admin-game{
+    background:#020617;
+    padding:12px;
+    border-radius:10px;
+    margin:10px 0;
+}
+
+.admin-game small{
+    display:block;
+    color:#64748b;
+    margin:5px 0 10px;
+}
+
+hr{
+    border:0;
+    border-top:1px solid #334155;
+    margin:25px 0;
+}
+
+@media(max-width:600px){
+    header{
+        padding:12px;
+    }
+
+    .logo{
+        font-size:20px;
+    }
+
+    .games{
+        grid-template-columns:repeat(2,1fr);
+        gap:10px;
+    }
+
+    .game-picture{
+        height:125px;
+    }
+
+    .game-info{
+        padding:10px;
+    }
+
+    .game-name{
+        font-size:14px;
+    }
+
+    header button{
+        padding:8px 10px;
+        font-size:12px;
+    }
+}
 </style>
 </head>
+
 <body>
-<header><div class="logo">🎮 <span>GameZone</span></div><nav>
-<button class="green" onclick="openModal('userLogin')">👤 Login</button>
-<button class="purple" onclick="openModal('adminLogin')">🔐 Admin</button>
-</nav></header>
-<section class="hero"><h1>PLAY FREE.</h1><p>Play games uploaded to GameZone.</p></section>
-<div class="search"><input id="search" placeholder="🔎 Search games..." oninput="renderGames()"></div>
-<div class="status" id="status"></div>
+
+<header>
+    <div class="logo">🎮 <span>GameZone</span></div>
+
+    <div>
+        <button class="green" onclick="openModal('userLogin')">
+            👤 Login
+        </button>
+
+        <button class="purple" onclick="openModal('adminLogin')">
+            🔐 Admin
+        </button>
+    </div>
+</header>
+
+
+<section class="hero">
+    <h1>PLAY FREE.</h1>
+    <p>Add games by URL or upload your own HTML game.</p>
+</section>
+
+
+<div class="search">
+    <input
+        id="searchInput"
+        type="text"
+        placeholder="🔎 Search games..."
+        oninput="renderGames()"
+    >
+</div>
+
+<div id="status" class="status"></div>
+
+
 <main class="container">
-<div class="heading"><h2>🎮 All Games</h2><span class="count" id="count">0 games</span></div><br>
-<div id="games" class="games"></div><div id="empty" class="empty">🎮<br><br>No games have been uploaded yet.</div>
+
+    <div class="heading">
+        <h2>🎮 All Games</h2>
+        <span id="gameCount" class="count">0 games</span>
+    </div>
+
+    <br>
+
+    <div id="gamesContainer" class="games"></div>
+
+    <div id="emptyMessage" class="empty">
+        🎮<br><br>
+        No games have been added yet.
+    </div>
+
 </main>
 
-<div class="modal" id="userLogin"><div class="box"><h2>👤 User Login</h2>
-<div class="field"><label>Username</label><input id="username"></div>
-<div class="field"><label>Password</label><input id="password" type="password"></div>
-<div class="actions"><button class="blue" onclick="userLogin()">Login</button><button class="gray" onclick="closeModal('userLogin')">Cancel</button></div>
-</div></div>
 
-<div class="modal" id="adminLogin"><div class="box"><h2>🔐 Admin Panel</h2>
-<div class="field"><label>Admin Code</label><input id="adminCode" type="password"></div>
-<div class="actions"><button class="purple" onclick="adminLogin()">Unlock</button><button class="gray" onclick="closeModal('adminLogin')">Cancel</button></div>
-</div></div>
+<!-- USER LOGIN -->
 
-<div class="modal" id="uploadPanel"><div class="box"><h2>➕ Add Game</h2>
-<div class="field"><label>Game Name</label><input id="userGameName" placeholder="Game name"></div>
-<div class="field"><label>Game Picture</label><input id="userGameImage" type="file" accept="image/*"></div>
-<div class="field"><label>Game File</label><input id="userGameFile" type="file" accept=".html,.htm"></div>
-<div class="actions"><button class="green" onclick="uploadUserGame()">Upload Game</button><button class="gray" onclick="closeModal('uploadPanel')">Close</button></div>
-</div></div>
+<div class="modal" id="userLogin">
 
-<div class="modal" id="adminPanel"><div class="box"><h2>⚙️ Admin Panel</h2>
-<div class="field"><label>Game Name</label><input id="adminGameName" placeholder="Game name"></div>
-<div class="field"><label>Game Picture</label><input id="adminGameImage" type="file" accept="image/*"></div>
-<div class="field"><label>Game File</label><input id="adminGameFile" type="file" accept=".html,.htm"></div>
-<div class="actions"><button class="blue" onclick="uploadAdminGame()">➕ Add Game</button><button class="gray" onclick="closeModal('adminPanel')">Close</button></div>
-<hr><h3>🗑️ Manage Games</h3><div id="adminGames"></div>
-</div></div>
+    <div class="modal-box">
+
+        <h2>👤 User Login</h2>
+
+        <div class="field">
+            <label>Username</label>
+            <input id="username">
+        </div>
+
+        <div class="field">
+            <label>Password</label>
+            <input id="password" type="password">
+        </div>
+
+        <div class="actions">
+
+            <button class="blue" onclick="loginUser()">
+                Login
+            </button>
+
+            <button class="gray" onclick="closeModal('userLogin')">
+                Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ADMIN LOGIN -->
+
+<div class="modal" id="adminLogin">
+
+    <div class="modal-box">
+
+        <h2>🔐 Admin Login</h2>
+
+        <div class="field">
+            <label>Admin Code</label>
+            <input id="adminCode" type="password">
+        </div>
+
+        <div class="actions">
+
+            <button class="purple" onclick="loginAdmin()">
+                Unlock
+            </button>
+
+            <button class="gray" onclick="closeModal('adminLogin')">
+                Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- USER ADD GAME -->
+
+<div class="modal" id="userAddGame">
+
+    <div class="modal-box">
+
+        <h2>➕ Add Game</h2>
+
+        <!-- THESE ARE THE TWO OPTIONS -->
+
+        <div class="mode-buttons">
+
+            <button
+                id="userUrlButton"
+                class="mode-button selected"
+                onclick="selectUserMode('url')">
+                🔗 Game URL
+            </button>
+
+            <button
+                id="userFileButton"
+                class="mode-button"
+                onclick="selectUserMode('file')">
+                📁 Game File
+            </button>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>Game Name</label>
+
+            <input
+                id="userGameName"
+                placeholder="Enter game name"
+            >
+
+        </div>
+
+
+        <!-- URL OPTION -->
+
+        <div id="userUrlSection">
+
+            <div class="field">
+
+                <label>Game URL</label>
+
+                <input
+                    id="userGameURL"
+                    type="url"
+                    placeholder="https://example.com/game"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- FILE OPTION -->
+
+        <div
+            id="userFileSection"
+            style="display:none;">
+
+            <div class="field">
+
+                <label>Game HTML File</label>
+
+                <input
+                    id="userGameFile"
+                    type="file"
+                    accept=".html,.htm"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>Game Picture</label>
+
+            <input
+                id="userGamePicture"
+                type="file"
+                accept="image/*"
+            >
+
+        </div>
+
+
+        <div class="actions">
+
+            <button class="green" onclick="addUserGame()">
+                ➕ Add Game
+            </button>
+
+            <button
+                class="gray"
+                onclick="closeModal('userAddGame')">
+                Close
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ADMIN PANEL -->
+
+<div class="modal" id="adminPanel">
+
+    <div class="modal-box">
+
+        <h2>⚙️ Admin Panel</h2>
+
+
+        <div class="mode-buttons">
+
+            <button
+                id="adminUrlButton"
+                class="mode-button selected"
+                onclick="selectAdminMode('url')">
+                🔗 Game URL
+            </button>
+
+            <button
+                id="adminFileButton"
+                class="mode-button"
+                onclick="selectAdminMode('file')">
+                📁 Game File
+            </button>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>Game Name</label>
+
+            <input
+                id="adminGameName"
+                placeholder="Enter game name"
+            >
+
+        </div>
+
+
+        <!-- ADMIN URL -->
+
+        <div id="adminUrlSection">
+
+            <div class="field">
+
+                <label>Game URL</label>
+
+                <input
+                    id="adminGameURL"
+                    type="url"
+                    placeholder="https://example.com/game"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- ADMIN FILE -->
+
+        <div
+            id="adminFileSection"
+            style="display:none;">
+
+            <div class="field">
+
+                <label>Game HTML File</label>
+
+                <input
+                    id="adminGameFile"
+                    type="file"
+                    accept=".html,.htm"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="field">
+
+            <label>Game Picture</label>
+
+            <input
+                id="adminGamePicture"
+                type="file"
+                accept="image/*"
+            >
+
+        </div>
+
+
+        <div class="actions">
+
+            <button class="blue" onclick="addAdminGame()">
+                ➕ Add Game
+            </button>
+
+            <button
+                class="gray"
+                onclick="closeModal('adminPanel')">
+                Close
+            </button>
+
+        </div>
+
+
+        <hr>
+
+        <h3>🗑️ Manage Games</h3>
+
+        <div id="adminGames"></div>
+
+    </div>
+
+</div>
+
 
 <script>
-const SUPABASE_URL="https://wrmqzkgfdffdyalkuxrk.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY="sb_publishable_YYPmntWwTY4WFf-e8qW28g_dhZvy7GR";
-const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
-const ADMIN_CODE="PARAM",USERNAME="PARAM1",PASSWORD="GOD";
-let games=[],loggedIn=false,adminMode=false;
+
+/* ==============================
+   SUPABASE
+============================== */
+
+const SUPABASE_URL =
+"https://wrmqzkgfdffdyalkuxrk.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_YYPmntWwTY4WFf-e8qW28g_dhZvy7GR";
+
+const supabaseClient =
+supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* ==============================
+   LOGIN
+============================== */
+
+const ADMIN_CODE = "PARAM";
+
+const USERNAME = "PARAM1";
+
+const PASSWORD = "GOD";
+
+
+let games = [];
+
+let userLoggedIn = false;
+
+let adminLoggedIn = false;
+
+let userMode = "url";
+
+let adminMode = "url";
+
+
+/* ==============================
+   MODALS
+============================== */
+
+function openModal(id){
+
+    document.getElementById(id).style.display =
+        "flex";
+
+}
+
+function closeModal(id){
+
+    document.getElementById(id).style.display =
+        "none";
+
+}
+
+
+/* ==============================
+   USER MODE
+============================== */
+
+function selectUserMode(mode){
+
+    userMode = mode;
+
+
+    document
+        .getElementById("userUrlButton")
+        .classList.toggle(
+            "selected",
+            mode === "url"
+        );
+
+
+    document
+        .getElementById("userFileButton")
+        .classList.toggle(
+            "selected",
+            mode === "file"
+        );
+
+
+    document
+        .getElementById("userUrlSection")
+        .style.display =
+            mode === "url"
+            ? "block"
+            : "none";
+
+
+    document
+        .getElementById("userFileSection")
+        .style.display =
+            mode === "file"
+            ? "block"
+            : "none";
+
+}
+
+
+/* ==============================
+   ADMIN MODE
+============================== */
+
+function selectAdminMode(mode){
+
+    adminMode = mode;
+
+
+    document
+        .getElementById("adminUrlButton")
+        .classList.toggle(
+            "selected",
+            mode === "url"
+        );
+
+
+    document
+        .getElementById("adminFileButton")
+        .classList.toggle(
+            "selected",
+            mode === "file"
+        );
+
+
+    document
+        .getElementById("adminUrlSection")
+        .style.display =
+            mode === "url"
+            ? "block"
+            : "none";
+
+
+    document
+        .getElementById("adminFileSection")
+        .style.display =
+            mode === "file"
+            ? "block"
+            : "none";
+
+}
+
+
+/* ==============================
+   USER LOGIN
+============================== */
+
+function loginUser(){
+
+    const username =
+        document.getElementById("username").value;
+
+    const password =
+        document.getElementById("password").value;
+
+
+    if(
+        username === USERNAME &&
+        password === PASSWORD
+    ){
+
+        userLoggedIn = true;
+
+        closeModal("userLogin");
+
+        openModal("userAddGame");
+
+    }
+    else{
+
+        alert(
+            "Wrong username or password."
+        );
+
+    }
+
+}
+
+
+/* ==============================
+   ADMIN LOGIN
+============================== */
+
+function loginAdmin(){
+
+    const code =
+        document.getElementById("adminCode").value;
+
+
+    if(code === ADMIN_CODE){
+
+        adminLoggedIn = true;
+
+        closeModal("adminLogin");
+
+        openModal("adminPanel");
+
+        renderAdminGames();
+
+    }
+    else{
+
+        alert("Wrong admin code.");
+
+    }
+
+}
+
+
+/* ==============================
+   LOAD GAMES
+============================== */
 
 async function loadGames(){
- const {data,error}=await supabaseClient.from("games").select("*").order("created_at",{ascending:false});
- if(error){console.error(error);document.getElementById("status").textContent="Could not load games: "+error.message;return}
- games=data||[];renderGames();renderAdminGames();
+
+    const result =
+        await supabaseClient
+        .from("games")
+        .select("*")
+        .order(
+            "created_at",
+            {ascending:false}
+        );
+
+
+    if(result.error){
+
+        console.error(result.error);
+
+        document.getElementById("status")
+        .textContent =
+            "Could not load games: " +
+            result.error.message;
+
+        return;
+
+    }
+
+
+    games = result.data || [];
+
+    renderGames();
+
+    renderAdminGames();
+
 }
+
+
+/* ==============================
+   DISPLAY GAMES
+============================== */
+
 function renderGames(){
- const q=document.getElementById("search").value.toLowerCase();
- const list=games.filter(g=>(g.name||"").toLowerCase().includes(q));
- document.getElementById("count").textContent=list.length+(list.length===1?" game":" games");
- const box=document.getElementById("games");box.innerHTML="";
- document.getElementById("empty").style.display=list.length?"none":"block";
- list.forEach(g=>{
-  const card=document.createElement("div");card.className="game";
-  const image=document.createElement("div");image.className="game-image";
-  const img=document.createElement("img");img.src=g.image_url;img.alt=g.name||"Game";image.appendChild(img);
-  const info=document.createElement("div");info.className="info";
-  const name=document.createElement("div");name.className="name";name.textContent=g.name||"Unnamed game";
-  const by=document.createElement("div");by.className="by";by.textContent="Added by "+(g.added_by||"User");
-  info.append(name,by);card.append(image,info);
-  image.onclick=()=>window.open(g.game_url,"_blank");name.onclick=()=>window.open(g.game_url,"_blank");
-  box.appendChild(card);
- });
+
+    const search =
+        document
+        .getElementById("searchInput")
+        .value
+        .toLowerCase();
+
+
+    const list =
+        games.filter(game =>
+            (game.name || "")
+            .toLowerCase()
+            .includes(search)
+        );
+
+
+    document.getElementById("gameCount")
+        .textContent =
+            list.length +
+            (list.length === 1
+                ? " game"
+                : " games");
+
+
+    const container =
+        document.getElementById(
+            "gamesContainer"
+        );
+
+
+    container.innerHTML = "";
+
+
+    document.getElementById(
+        "emptyMessage"
+    ).style.display =
+        list.length
+        ? "none"
+        : "block";
+
+
+    list.forEach(game => {
+
+        const card =
+            document.createElement("div");
+
+        card.className = "game";
+
+
+        const picture =
+            document.createElement("div");
+
+        picture.className =
+            "game-picture";
+
+
+        const image =
+            document.createElement("img");
+
+        image.src =
+            game.image_url;
+
+        image.alt =
+            game.name || "Game";
+
+
+        picture.appendChild(image);
+
+
+        const info =
+            document.createElement("div");
+
+        info.className =
+            "game-info";
+
+
+        const name =
+            document.createElement("div");
+
+        name.className =
+            "game-name";
+
+        name.textContent =
+            game.name || "Unnamed Game";
+
+
+        const added =
+            document.createElement("div");
+
+        added.className =
+            "added-by";
+
+        added.textContent =
+            "Added by " +
+            (game.added_by || "User");
+
+
+        info.appendChild(name);
+
+        info.appendChild(added);
+
+
+        card.appendChild(picture);
+
+        card.appendChild(info);
+
+
+        const openGame = () => {
+
+            if(game.game_url){
+
+                window.open(
+                    game.game_url,
+                    "_blank"
+                );
+
+            }
+
+        };
+
+
+        picture.onclick = openGame;
+
+        name.onclick = openGame;
+
+
+        container.appendChild(card);
+
+    });
+
 }
-function userLogin(){
- if(document.getElementById("username").value===USERNAME&&document.getElementById("password").value===PASSWORD){
-  loggedIn=true;closeModal("userLogin");openModal("uploadPanel");
- }else alert("Wrong username or password.");
+
+
+/* ==============================
+   UPLOAD IMAGE
+============================== */
+
+async function uploadImage(file){
+
+    const path =
+        Date.now() +
+        "-" +
+        Math.random()
+        .toString(36)
+        .substring(2) +
+        "-" +
+        file.name.replace(
+            /\s+/g,
+            "-"
+        );
+
+
+    const result =
+        await supabaseClient
+        .storage
+        .from("game-images")
+        .upload(
+            path,
+            file
+        );
+
+
+    if(result.error){
+
+        throw new Error(
+            "Image upload failed: " +
+            result.error.message
+        );
+
+    }
+
+
+    const publicURL =
+        supabaseClient
+        .storage
+        .from("game-images")
+        .getPublicUrl(path)
+        .data
+        .publicUrl;
+
+
+    return {
+        path:path,
+        url:publicURL
+    };
+
 }
-function adminLogin(){
- if(document.getElementById("adminCode").value===ADMIN_CODE){
-  adminMode=true;closeModal("adminLogin");openModal("adminPanel");
- }else alert("Wrong admin code.");
+
+
+/* ==============================
+   UPLOAD GAME FILE
+============================== */
+
+async function uploadGameFile(file){
+
+    const path =
+        Date.now() +
+        "-" +
+        Math.random()
+        .toString(36)
+        .substring(2) +
+        "-" +
+        file.name.replace(
+            /\s+/g,
+            "-"
+        );
+
+
+    const result =
+        await supabaseClient
+        .storage
+        .from("game-files")
+        .upload(
+            path,
+            file,
+            {
+                contentType:"text/html"
+            }
+        );
+
+
+    if(result.error){
+
+        throw new Error(
+            "Game file upload failed: " +
+            result.error.message
+        );
+
+    }
+
+
+    const publicURL =
+        supabaseClient
+        .storage
+        .from("game-files")
+        .getPublicUrl(path)
+        .data
+        .publicUrl;
+
+
+    return {
+        path:path,
+        url:publicURL
+    };
+
 }
-async function uploadUserGame(){if(!loggedIn)return alert("Please login first.");await uploadGame("userGameName","userGameImage","userGameFile","User")}
-async function uploadAdminGame(){if(!adminMode)return alert("Admin access required.");await uploadGame("adminGameName","adminGameImage","adminGameFile","Admin")}
-async function uploadGame(nameID,imageID,fileID,addedBy){
- const name=document.getElementById(nameID).value.trim(),image=document.getElementById(imageID).files[0],gameFile=document.getElementById(fileID).files[0];
- if(!name||!image||!gameFile)return alert("Please enter the game name and select both files.");
- if(!/\.(html|htm)$/i.test(gameFile.name))return alert("Game file must be HTML.");
- document.getElementById("status").textContent="Uploading game...";
- const unique=Date.now()+"-"+Math.random().toString(36).substring(2);
- const imagePath=unique+"-"+image.name.replace(/\s+/g,"-"),gamePath=unique+"-"+gameFile.name.replace(/\s+/g,"-");
- let r=await supabaseClient.storage.from("game-images").upload(imagePath,image);
- if(r.error)return alert("Image upload failed: "+r.error.message);
- r=await supabaseClient.storage.from("game-files").upload(gamePath,gameFile);
- if(r.error)return alert("Game upload failed: "+r.error.message);
- const imageURL=supabaseClient.storage.from("game-images").getPublicUrl(imagePath).data.publicUrl;
- const gameURL=supabaseClient.storage.from("game-files").getPublicUrl(gamePath).data.publicUrl;
- r=await supabaseClient.from("games").insert({name,image_url:imageURL,game_url:gameURL,added_by:addedBy});
- if(r.error)return alert("Database error: "+r.error.message);
- alert("🎉 Game uploaded successfully!");
- document.getElementById(nameID).value="";document.getElementById(imageID).value="";document.getElementById(fileID).value="";
- closeModal(addedBy==="Admin"?"adminPanel":"uploadPanel");await loadGames();
+
+
+/* ==============================
+   ADD GAME
+============================== */
+
+async function saveGame(
+    mode,
+    name,
+    url,
+    imageFile,
+    gameFile,
+    addedBy
+){
+
+    if(!name){
+
+        alert(
+            "Please enter the game name."
+        );
+
+        return;
+
+    }
+
+
+    if(!imageFile){
+
+        alert(
+            "Please select a game picture."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        mode === "url" &&
+        !url
+    ){
+
+        alert(
+            "Please enter the game URL."
+        );
+
+        return;
+
+    }
+
+
+    let gameURL = url;
+
+    let gameFilePath = null;
+
+    let imagePath = null;
+
+
+    try{
+
+        /* URL MODE */
+
+        if(mode === "url"){
+
+            try{
+
+                new URL(url);
+
+            }
+            catch{
+
+                alert(
+                    "Please enter a valid URL, for example https://example.com/game"
+                );
+
+                return;
+
+            }
+
+        }
+
+
+        /* FILE MODE */
+
+        if(mode === "file"){
+
+            if(!gameFile){
+
+                alert(
+                    "Please select an HTML game file."
+                );
+
+                return;
+
+            }
+
+
+            if(
+                !/\.(html|htm)$/i
+                .test(gameFile.name)
+            ){
+
+                alert(
+                    "Please select an HTML file."
+                );
+
+                return;
+
+            }
+
+
+            const uploadedGame =
+                await uploadGameFile(
+                    gameFile
+                );
+
+
+            gameURL =
+                uploadedGame.url;
+
+            gameFilePath =
+                uploadedGame.path;
+
+        }
+
+
+        /* IMAGE */
+
+        const uploadedImage =
+            await uploadImage(
+                imageFile
+            );
+
+
+        imagePath =
+            uploadedImage.path;
+
+
+        /* DATABASE */
+
+        const result =
+            await supabaseClient
+            .from("games")
+            .insert({
+
+                name:name,
+
+                game_url:gameURL,
+
+                image_url:
+                    uploadedImage.url,
+
+                added_by:addedBy,
+
+                game_type:mode,
+
+                game_file_path:
+                    gameFilePath
+
+            });
+
+
+        if(result.error){
+
+            throw new Error(
+                "Database error: " +
+                result.error.message
+            );
+
+        }
+
+
+        alert(
+            "🎉 Game added successfully!"
+        );
+
+
+        await loadGames();
+
+
+    }
+    catch(error){
+
+        console.error(error);
+
+        alert(error.message);
+
+
+        if(imagePath){
+
+            await supabaseClient
+            .storage
+            .from("game-images")
+            .remove([imagePath]);
+
+        }
+
+
+        if(gameFilePath){
+
+            await supabaseClient
+            .storage
+            .from("game-files")
+            .remove([gameFilePath]);
+
+        }
+
+    }
+
 }
+
+
+/* ==============================
+   USER ADD
+============================== */
+
+async function addUserGame(){
+
+    if(!userLoggedIn){
+
+        alert(
+            "Please login first."
+        );
+
+        return;
+
+    }
+
+
+    const name =
+        document.getElementById(
+            "userGameName"
+        ).value.trim();
+
+
+    const url =
+        document.getElementById(
+            "userGameURL"
+        ).value.trim();
+
+
+    const image =
+        document.getElementById(
+            "userGamePicture"
+        ).files[0];
+
+
+    const file =
+        document.getElementById(
+            "userGameFile"
+        ).files[0];
+
+
+    await saveGame(
+        userMode,
+        name,
+        url,
+        image,
+        file,
+        "User"
+    );
+
+}
+
+
+/* ==============================
+   ADMIN ADD
+============================== */
+
+async function addAdminGame(){
+
+    if(!adminLoggedIn){
+
+        alert(
+            "Admin access required."
+        );
+
+        return;
+
+    }
+
+
+    const name =
+        document.getElementById(
+            "adminGameName"
+        ).value.trim();
+
+
+    const url =
+        document.getElementById(
+            "adminGameURL"
+        ).value.trim();
+
+
+    const image =
+        document.getElementById(
+            "adminGamePicture"
+        ).files[0];
+
+
+    const file =
+        document.getElementById(
+            "adminGameFile"
+        ).files[0];
+
+
+    await saveGame(
+        adminMode,
+        name,
+        url,
+        image,
+        file,
+        "Admin"
+    );
+
+}
+
+
+/* ==============================
+   ADMIN GAME LIST
+============================== */
+
 function renderAdminGames(){
- const box=document.getElementById("adminGames");box.innerHTML="";
- games.forEach(g=>{
-  const item=document.createElement("div");item.className="admin-game";
-  const title=document.createElement("strong");title.textContent=g.name||"Unnamed game";
-  const small=document.createElement("small");small.textContent="Added by "+(g.added_by||"User");
-  const btn=document.createElement("button");btn.className="red";btn.textContent="🗑️ Delete";btn.onclick=()=>deleteGame(g);
-  item.append(title,small,btn);box.appendChild(item);
- });
+
+    const container =
+        document.getElementById(
+            "adminGames"
+        );
+
+
+    container.innerHTML = "";
+
+
+    games.forEach(game => {
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "admin-game";
+
+
+        const title =
+            document.createElement("strong");
+
+        title.textContent =
+            game.name || "Unnamed Game";
+
+
+        const small =
+            document.createElement("small");
+
+        small.textContent =
+            "Added by " +
+            (game.added_by || "User") +
+            " • " +
+            (
+                game.game_type === "file"
+                ? "📁 Game File"
+                : "🔗 Game URL"
+            );
+
+
+        const button =
+            document.createElement("button");
+
+        button.className =
+            "red";
+
+        button.textContent =
+            "🗑️ Delete";
+
+
+        button.onclick =
+            () => deleteGame(game);
+
+
+        item.appendChild(title);
+
+        item.appendChild(small);
+
+        item.appendChild(button);
+
+
+        container.appendChild(item);
+
+    });
+
 }
+
+
+/* ==============================
+   DELETE GAME
+============================== */
+
 async function deleteGame(game){
- if(!adminMode)return alert("Admin access required.");
- if(!confirm('Delete "'+(game.name||"this game")+'"?'))return;
- let r=await supabaseClient.from("games").delete().eq("id",game.id);
- if(r.error)return alert("Delete failed: "+r.error.message);
- const ip=game.image_url?.split("/game-images/")[1],gp=game.game_url?.split("/game-files/")[1];
- if(ip)await supabaseClient.storage.from("game-images").remove([ip]);
- if(gp)await supabaseClient.storage.from("game-files").remove([gp]);
- await loadGames();alert("Game deleted.");
+
+    if(!adminLoggedIn){
+
+        alert(
+            "Admin access required."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        !confirm(
+            'Delete "' +
+            game.name +
+            '"?'
+        )
+    ){
+
+        return;
+
+    }
+
+
+    const result =
+        await supabaseClient
+        .from("games")
+        .delete()
+        .eq(
+            "id",
+            game.id
+        );
+
+
+    if(result.error){
+
+        alert(
+            "Delete failed: " +
+            result.error.message
+        );
+
+        return;
+
+    }
+
+
+    alert(
+        "Game deleted."
+    );
+
+
+    await loadGames();
+
 }
-function openModal(id){document.getElementById(id).style.display="flex"}
-function closeModal(id){document.getElementById(id).style.display="none"}
-window.onclick=e=>document.querySelectorAll(".modal").forEach(m=>{if(e.target===m)m.style.display="none"});
+
+
+/* ==============================
+   CLOSE MODALS
+============================== */
+
+window.onclick =
+    function(event){
+
+        document
+        .querySelectorAll(".modal")
+        .forEach(modal => {
+
+            if(event.target === modal){
+
+                modal.style.display =
+                    "none";
+
+            }
+
+        });
+
+    };
+
+
+/* ==============================
+   START
+============================== */
+
 loadGames();
+
 </script>
+
 </body>
 </html>
