@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Fruit Slash Ultra</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#02060d}
+body{font-family:Arial,Helvetica,sans-serif;touch-action:none}
+canvas{display:block;width:100vw;height:100vh}
+#ui{position:fixed;inset:0;pointer-events:none;color:#fff}
+.top{position:absolute;top:18px;left:20px;right:20px;display:flex;justify-content:space-between;align-items:flex-start}
+.badge{padding:10px 15px;border:1px solid rgba(255,255,255,.14);border-radius:18px;background:rgba(3,10,20,.5);backdrop-filter:blur(8px);box-shadow:0 8px 30px rgba(0,0,0,.25);text-shadow:0 2px 6px #000}
+.score{font-size:25px;font-weight:900}.level{font-size:18px;font-weight:800;color:#ffe08a}
+#lives{position:absolute;top:72px;left:24px;font-size:22px;letter-spacing:4px;text-shadow:0 2px 8px #000}
+#combo{position:absolute;left:0;right:0;top:42%;text-align:center;font-size:clamp(30px,7vw,58px);font-weight:1000;font-style:italic;opacity:0;transform:scale(.6);transition:.18s;filter:drop-shadow(0 5px 8px #000)}
+.screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,rgba(30,80,110,.38),rgba(0,0,0,.88) 70%);z-index:5}
+.panel{width:min(520px,90vw);padding:42px 28px;text-align:center;border-radius:30px;background:linear-gradient(145deg,rgba(18,33,49,.96),rgba(3,8,15,.98));border:1px solid rgba(255,255,255,.18);box-shadow:0 25px 90px #000}
+.logo{font-size:clamp(48px,10vw,88px);line-height:.82;font-weight:1000;letter-spacing:-5px;background:linear-gradient(#fff,#ffe071 42%,#ff681e 85%);-webkit-background-clip:text;color:transparent;margin-bottom:22px}
+.subtitle{color:#cbd8e4;line-height:1.55;margin-bottom:28px}
+button{border:0;border-radius:999px;padding:16px 42px;font-size:20px;font-weight:900;color:#fff;background:linear-gradient(#ff9d3e,#db4615);box-shadow:0 7px 0 #8e280c,0 15px 35px rgba(0,0,0,.5);cursor:pointer}
+button:active{transform:translateY(5px);box-shadow:0 2px 0 #8e280c}
+.small{margin-top:18px;color:#9fb0bf}
+</style>
+</head>
+<body>
+<canvas id="game"></canvas>
+<div id="ui">
+  <div class="top">
+    <div class="badge score">SCORE <span id="score">0</span></div>
+    <div class="badge level">LEVEL <span id="level">1</span></div>
+  </div>
+  <div id="lives">♥ ♥ ♥</div>
+  <div id="combo"></div>
+</div>
+
+<div class="screen" id="startScreen">
+  <div class="panel">
+    <div class="logo">FRUIT<br>SLASH</div>
+    <div class="subtitle">Ultra visuals • smooth slicing • touch & mouse<br>Slice the fruit. Avoid the bombs.</div>
+    <button onclick="startGame()">PLAY NOW</button>
+    <div class="small">Best Score: <span id="best">0</span></div>
+  </div>
+</div>
+
+<div class="screen" id="gameOver" style="display:none">
+  <div class="panel">
+    <div class="logo">GAME<br>OVER</div>
+    <div class="subtitle">Final Score: <b id="finalScore">0</b><br>High Score: <b id="finalBest">0</b></div>
+    <button onclick="startGame()">PLAY AGAIN</button>
+  </div>
+</div>
+
+<script>
+const canvas=document.getElementById("game"),ctx=canvas.getContext("2d");
+let W,H,DPR;
+function resize(){
+  DPR=Math.min(devicePixelRatio||1,2); W=innerWidth; H=innerHeight;
+  canvas.width=W*DPR; canvas.height=H*DPR;
+  canvas.style.width=W+"px"; canvas.style.height=H+"px";
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+addEventListener("resize",resize); resize();
+
+const scoreEl=document.getElementById("score"),levelEl=document.getElementById("level"),
+livesEl=document.getElementById("lives"),comboEl=document.getElementById("combo");
+let fruits=[],particles=[],trail=[],running=false,last=0,spawn=0,score=0,level=1,lives=3,combo=0,shake=0;
+let high=+localStorage.getItem("fruitSlashUltraHigh")||0;
+document.getElementById("best").textContent=high;
+
+const types=[
+ {color:"#40b95a",inside:"#ff5267",seed:"#2a171b",leaf:"#347d32"},
+ {color:"#ff8a1b",inside:"#ffd35a",seed:"#fff1b1",leaf:"#5b7f2d"},
+ {color:"#ed3845",inside:"#ffe0c1",seed:"#4c2b22",leaf:"#3d792d"},
+ {color:"#f4d92e",inside:"#fff59a",seed:"#867927",leaf:"#6e8730"},
+ {color:"#a746d2",inside:"#ef74ef",seed:"#5e1c6a",leaf:"#3d6b31"},
+ {color:"#58c947",inside:"#d7ff79",seed:"#315d20",leaf:"#2e762f"}
+];
+
+class Fruit{
+ constructor(t,x,y,vx,vy,r){this.t=t;this.x=x;this.y=y;this.vx=vx;this.vy=vy;this.r=r;this.rot=Math.random()*7;this.spin=(Math.random()-.5)*.11;this.gravity=.145;this.seen=false;this.dead=false}
+ update(dt){
+   this.vy+=this.gravity*dt; this.x+=this.vx*dt; this.y+=this.vy*dt; this.rot+=this.spin*dt;
+   if(this.x>-this.r&&this.x<W+this.r&&this.y>-this.r&&this.y<H+this.r)this.seen=true;
+   if(this.y>H+170){if(this.seen&&!this.t.bomb)loseLife();this.dead=true}
+ }
+ draw(){
+   ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rot);
+   if(this.t.bomb){bomb(this.r);ctx.restore();return}
+   let r=this.r,t=this.t;
+   // soft shadow
+   ctx.beginPath();ctx.ellipse(r*.12,r*.22,r*.9,r*.72,0,0,7);ctx.fillStyle="rgba(0,0,0,.38)";ctx.fill();
+   // rich radial fruit shading
+   let g=ctx.createRadialGradient(-r*.34,-r*.38,r*.03,0,0,r*1.12);
+   g.addColorStop(0,"#fff");g.addColorStop(.08,lighten(t.color,.25));g.addColorStop(.28,t.color);g.addColorStop(1,darken(t.color,.5));
+   ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fillStyle=g;ctx.fill();
+   ctx.lineWidth=Math.max(2,r*.065);ctx.strokeStyle="rgba(0,0,0,.3)";ctx.stroke();
+   // glossy highlight
+   ctx.beginPath();ctx.ellipse(-r*.31,-r*.35,r*.22,r*.12,-.5,0,7);ctx.fillStyle="rgba(255,255,255,.42)";ctx.fill();
+   ctx.beginPath();ctx.arc(-r*.12,-r*.18,r*.08,0,7);ctx.fillStyle="rgba(255,255,255,.2)";ctx.fill();
+   // stem and leaf
+   ctx.lineCap="round";ctx.strokeStyle=t.leaf;ctx.lineWidth=r*.09;
+   ctx.beginPath();ctx.moveTo(0,-r*.82);ctx.quadraticCurveTo(r*.05,-r*1.15,r*.2,-r*1.1);ctx.stroke();
+   ctx.beginPath();ctx.ellipse(r*.28,-r*.99,r*.2,r*.09,.35,0,7);ctx.fillStyle=t.leaf;ctx.fill();
+   ctx.restore();
+ }
+}
+function lighten(hex,a){let n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;r=Math.min(255,r+(255-r)*a);g=Math.min(255,g+(255-g)*a);b=Math.min(255,b+(255-b)*a);return`rgb(${r|0},${g|0},${b|0})`}
+function darken(hex,a){let n=parseInt(hex.slice(1),16),r=n>>16,g=n>>8&255,b=n&255;return`rgb(${r*(1-a)|0},${g*(1-a)|0},${b*(1-a)|0})`}
+function bomb(r){
+ let g=ctx.createRadialGradient(-r*.3,-r*.4,r*.05,0,0,r);g.addColorStop(0,"#9aa0a5");g.addColorStop(.18,"#4b5055");g.addColorStop(.6,"#171a1e");g.addColorStop(1,"#030405");
+ ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.fillStyle=g;ctx.fill();ctx.strokeStyle="#aaa";ctx.lineWidth=2.5;ctx.stroke();
+ ctx.strokeStyle="#a96b27";ctx.lineWidth=r*.08;ctx.beginPath();ctx.moveTo(r*.12,-r*.82);ctx.quadraticCurveTo(r*.5,-r*1.35,r*.72,-r*1.02);ctx.stroke();
+ ctx.fillStyle="#ffe65b";ctx.shadowColor="#ff9b24";ctx.shadowBlur=15;ctx.beginPath();ctx.arc(r*.73,-r*1.03,r*.12,0,7);ctx.fill();ctx.shadowBlur=0;
+}
+function spawnFruit(){
+ const n=Math.random()<.28?2:1;
+ for(let i=0;i<n;i++){
+   const bombChance=Math.min(.09+level*.007,.19), isBomb=Math.random()<bombChance;
+   const t=isBomb?{bomb:true}:types[(Math.random()*types.length)|0];
+   const r=40+Math.random()*13,x=W*(.12+Math.random()*.76),y=H+r+Math.random()*65;
+   // Slightly slower than the previous version.
+   const vx=(Math.random()-.5)*6.2,vy=-(11.4+Math.random()*4.2+level*.27);
+   fruits.push(new Fruit(t,x,y,vx,vy,r));
+ }
+}
+function juice(x,y,c,n=28){
+ for(let i=0;i<n;i++){let a=Math.random()*7,s=2+Math.random()*8;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,size:3+Math.random()*7,color:c,life:1,decay:.018+Math.random()*.022,g:.1})}
+}
+function explosion(x,y){
+ for(let i=0;i<110;i++){let a=Math.random()*7,s=3+Math.random()*16;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,size:4+Math.random()*10,color:Math.random()<.5?"#ff7d1a":"#ffe66b",life:1,decay:.014+Math.random()*.018,g:.08})}
+}
+function slice(f){
+ if(f.dead)return;
+ if(f.t.bomb){explosion(f.x,f.y);f.dead=true;shake=25;lives=0;updateLives();setTimeout(endGame,350);return}
+ f.dead=true;juice(f.x,f.y,f.t.inside,34);score+=10;combo++;
+ if(combo>=3){score+=combo*5;showCombo(combo)}
+ scoreEl.textContent=score;if(score>high){high=score;localStorage.setItem("fruitSlashUltraHigh",high)}
+ setTimeout(()=>combo=0,600);
+}
+function loseLife(){if(!running)return;lives--;updateLives();shake=10;if(lives<=0)setTimeout(endGame,300)}
+function updateLives(){livesEl.textContent="♥ ".repeat(Math.max(0,lives)).trim()}
+function showCombo(n){comboEl.textContent=typeof n==="number"?`${n}× COMBO!`:n;comboEl.style.opacity=1;comboEl.style.transform="scale(1.08)";setTimeout(()=>{comboEl.style.opacity=0;comboEl.style.transform="scale(.6)"},700)}
+function distSeg(px,py,x1,y1,x2,y2){
+ let dx=x2-x1,dy=y2-y1;if(!dx&&!dy)return Math.hypot(px-x1,py-y1);
+ let t=((px-x1)*dx+(py-y1)*dy)/(dx*dx+dy*dy);t=Math.max(0,Math.min(1,t));
+ return Math.hypot(px-(x1+t*dx),py-(y1+t*dy));
+}
+function point(x,y){
+ if(!running)return;trail.push({x,y,life:1});if(trail.length>20)trail.shift();
+ if(trail.length<2)return;
+ let a=trail[trail.length-2],b=trail[trail.length-1];
+ fruits.forEach(f=>{if(!f.dead&&distSeg(f.x,f.y,a.x,a.y,b.x,b.y)<f.r+13)slice(f)})
+}
+function update(dt){
+ spawn+=dt;
+ // Slower spawn cadence too, so the game feels less frantic.
+ const interval=Math.max(27,82-level*2.5);
+ if(spawn>interval){spawn=0;spawnFruit()}
+ fruits.forEach(f=>f.update(dt));fruits=fruits.filter(f=>!f.dead);
+ particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.g*dt;p.life-=p.decay*dt});
+ particles=particles.filter(p=>p.life>0);
+ trail.forEach(t=>t.life-=.055*dt);trail=trail.filter(t=>t.life>0);
+ let nl=Math.floor(score/250)+1;if(nl!==level){level=nl;levelEl.textContent=level;showCombo("LEVEL "+level)}
+ shake*=Math.pow(.82,dt);
+}
+function background(){
+ let g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,"#13263a");g.addColorStop(.48,"#071421");g.addColorStop(1,"#010307");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+ ctx.save();ctx.globalAlpha=.065;
+ for(let i=0;i<7;i++){ctx.beginPath();ctx.moveTo(W/2,0);ctx.lineTo(i/6*W,H);ctx.lineTo((i+1)/6*W,H);ctx.closePath();ctx.fillStyle="#8bdcff";ctx.fill()}
+ ctx.restore();
+ // atmospheric glow
+ let rg=ctx.createRadialGradient(W*.5,H*.72,5,W*.5,H*.72,Math.max(W,H)*.65);rg.addColorStop(0,"rgba(54,140,190,.12)");rg.addColorStop(1,"rgba(0,0,0,0)");ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+}
+function drawParticles(){particles.forEach(p=>{ctx.save();ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.shadowColor=p.color;ctx.shadowBlur=8;ctx.beginPath();ctx.arc(p.x,p.y,p.size*p.life,0,7);ctx.fill();ctx.restore()})}
+function drawTrail(){
+ if(trail.length<2)return;ctx.save();ctx.lineCap="round";ctx.lineJoin="round";
+ for(let i=1;i<trail.length;i++){let a=trail[i-1],b=trail[i],op=Math.min(a.life,b.life);ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.strokeStyle=`rgba(210,248,255,${op})`;ctx.lineWidth=2+11*op;ctx.shadowColor="#65e3ff";ctx.shadowBlur=18;ctx.stroke()}
+ ctx.restore();
+}
+function draw(){
+ background();ctx.save();
+ if(shake>.5)ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);
+ fruits.forEach(f=>f.draw());drawParticles();drawTrail();ctx.restore();
+}
+function loop(t){if(!running)return;let dt=Math.min(2.3,(t-last)/16.67);last=t;update(dt);draw();requestAnimationFrame(loop)}
+function startGame(){
+ document.getElementById("startScreen").style.display="none";document.getElementById("gameOver").style.display="none";
+ fruits=[];particles=[];trail=[];score=0;level=1;lives=3;combo=0;shake=0;spawn=0;
+ scoreEl.textContent=0;levelEl.textContent=1;updateLives();running=true;last=performance.now();requestAnimationFrame(loop)
+}
+function endGame(){
+ if(!running)return;running=false;
+ if(score>high){high=score;localStorage.setItem("fruitSlashUltraHigh",high)}
+ document.getElementById("finalScore").textContent=score;document.getElementById("finalBest").textContent=high;document.getElementById("best").textContent=high;
+ document.getElementById("gameOver").style.display="flex";
+}
+canvas.addEventListener("mousemove",e=>point(e.clientX,e.clientY));
+canvas.addEventListener("mousedown",e=>{trail=[];point(e.clientX,e.clientY)});
+canvas.addEventListener("mouseleave",()=>trail=[]);
+canvas.addEventListener("touchstart",e=>{e.preventDefault();trail=[];for(const t of e.touches)point(t.clientX,t.clientY)},{passive:false});
+canvas.addEventListener("touchmove",e=>{e.preventDefault();for(const t of e.touches)point(t.clientX,t.clientY)},{passive:false});
+function menu(){if(!running){background();requestAnimationFrame(menu)}}menu();
+</script>
+</body>
+</html>
