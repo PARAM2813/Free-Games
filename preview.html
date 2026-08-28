@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>मराठी शब्दलेखन चॅम्पियन</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#10182b,#241044);color:#fff;min-height:100vh}
+.wrap{width:min(900px,94%);margin:auto;padding:22px 0}.top{display:flex;justify-content:space-between;align-items:center}.brand{font-size:clamp(22px,5vw,34px);font-weight:900}.brand span{color:#60a5fa}.pill,.stat{background:#ffffff12;border:1px solid #ffffff18;border-radius:12px;padding:10px}
+.card{margin-top:25px;background:#111827ee;border:1px solid #ffffff18;border-radius:24px;padding:clamp(20px,5vw,40px);text-align:center;box-shadow:0 20px 70px #0008}
+h1{font-size:clamp(28px,6vw,48px);margin:8px}.sub{color:#aab6ca}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0}.stat b{display:block;font-size:22px;margin-top:4px}
+.progress{height:9px;background:#020617;border-radius:20px;overflow:hidden}.bar{height:100%;width:100%;background:#60a5fa}.question{font-size:clamp(22px,5vw,34px);font-weight:800;margin:28px 0 20px}.choices{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.choice,.mainbtn{border:0;border-radius:14px;padding:16px;font-size:19px;font-weight:800;cursor:pointer}.choice{background:#1e293b;color:#fff;border:2px solid #334155}.choice:hover{background:#334155}.correct{background:#166534!important;border-color:#4ade80!important}.wrong{background:#991b1b!important;border-color:#f87171!important}.mainbtn{margin-top:22px;background:#2563eb;color:white}.hidden{display:none}.bigscore{font-size:52px;font-weight:900;color:#60a5fa}.feedback{min-height:28px;font-weight:bold}
+@media(max-width:600px){.stats{grid-template-columns:1fr 1fr}.choices{grid-template-columns:1fr}.choice{font-size:18px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="top"><div class="brand">🇮🇳 <span>मराठी</span> शब्दलेखन</div><div class="pill">🏆 Best: <b id="best">0</b></div></div>
+
+<div id="start" class="card">
+<h1>शब्दलेखन चॅम्पियन</h1>
+<p class="sub">योग्य मराठी शब्दलेखन निवडा आणि सर्वाधिक गुण मिळवा!</p>
+<button class="mainbtn" onclick="startGame()">🎮 गेम सुरू करा</button>
+</div>
+
+<div id="game" class="card hidden">
+<div class="stats">
+<div class="stat">🏆<b id="score">0</b>गुण</div>
+<div class="stat">❤️<b id="lives">3</b>Lives</div>
+<div class="stat">🔥<b id="streak">0</b>Streak</div>
+<div class="stat">📈<b id="level">1</b>Level</div>
+</div>
+<div class="progress"><div id="bar" class="bar"></div></div>
+<div id="question" class="question"></div>
+<div id="choices" class="choices"></div>
+<div id="feedback" class="feedback"></div>
+</div>
+
+<div id="result" class="card hidden">
+<h1>🎉 गेम संपला!</h1>
+<div id="finalScore" class="bigscore">0 गुण</div>
+<p id="summary"></p>
+<button class="mainbtn" onclick="startGame()">🔄 पुन्हा खेळा</button>
+</div>
+</div>
+
+<script>
+const questions=[
+["पाऊस",["पाउस","पाऊस","पावूस","पाऊष"]],["शाळा",["शाला","शाळा","शाळाा","शाळअ"]],
+["प्रश्न",["प्रष्न","प्रशन","प्रश्न","प्रश्‍न"]],["स्वातंत्र्य",["स्वातंत्र","स्वातंत्र्य","स्वातंत्र्य्य","सवातंत्र्य"]],
+["पर्यावरण",["पर्यावरण","पर्यावर्ण","पर्यवरण","पर्यावरणा"]],["आवश्यक",["आवष्यक","आवश्यक","अवश्यक","आवशक"]],
+["कृतज्ञ",["कृतग्न","कृतज्ञ","कृतज्ञ्य","कृतग्य"]],["सौंदर्य",["सौन्दर्य","सौंदर्य","सौंदऱ्य","सोंदर्य"]],
+["उत्सव",["उत्सव","उत्सव्व","उत्साव","उत्सव्"]],["ज्ञान",["ग्यान","ज्ञान","ग्नान","ज्ञाण"]],
+["स्वच्छता",["स्वछता","स्वच्छता","स्वच्छताा","सवच्छता"]],["चैतन्य",["चैतन्य","चैतन्य्य","चेतन्य","चैतन्यं"]],
+["निसर्ग",["निसर्ग","निसर्ग्ग","निसरग","निसर्गं"]],["आरोग्य",["आरोग्य","आरोग्य्य","आरोग","अरोग्य"]],
+["संस्कृती",["संसकृती","संस्कृती","संस्क्रुती","सन्स्कृती"]],["जबाबदारी",["जवाबदारी","जबाबदारी","जबाबदारीी","जबाबदरी"]],
+["महत्त्व",["महत्व","महत्त्व","महत्त्व्व","महत्‍व"]],["विद्यार्थी",["विद्यार्थी","विद्यर्थी","विध्यार्थी","विद्यार्थीी"]],
+["साहित्य",["साहित्त्य","साहित्य","साहीत्य","साहित्य्"]]
+];
+
+let order=[],i=0,score=0,lives=3,streak=0,correct=0,timer,timeLeft;
+let best=Number(localStorage.getItem("marathiBest")||0);document.getElementById("best").textContent=best;
+
+function startGame(){order=[...questions].sort(()=>Math.random()-.5);i=0;score=0;lives=3;streak=0;correct=0;document.getElementById("start").classList.add("hidden");document.getElementById("result").classList.add("hidden");document.getElementById("game").classList.remove("hidden");stats();show()}
+function stats(){document.getElementById("score").textContent=score;document.getElementById("lives").textContent=lives;document.getElementById("streak").textContent=streak;document.getElementById("level").textContent=1+Math.floor(correct/3)}
+function show(){
+ if(i>=order.length)return finish();
+ const [right,opts]=order[i];document.getElementById("question").textContent="Choose the correctly spelled word:";
+ const box=document.getElementById("choices");box.innerHTML="";document.getElementById("feedback").textContent="";
+ [...opts].sort(()=>Math.random()-.5).forEach(x=>{let b=document.createElement("button");b.className="choice";b.textContent=x;b.onclick=()=>answer(b,x===right,right);box.appendChild(b)});
+ timeLeft=Math.max(6,12-Math.floor(correct/4));bar();clearInterval(timer);timer=setInterval(()=>{timeLeft--;bar();if(timeLeft<=0)answer(null,false,right,true)},1000)
+}
+function bar(){document.getElementById("bar").style.width=(timeLeft/Math.max(6,12-Math.floor(correct/4))*100)+"%"}
+function answer(btn,ok,right,timed=false){
+ clearInterval(timer);document.querySelectorAll(".choice").forEach(b=>b.disabled=true);
+ if(ok){btn.classList.add("correct");streak++;correct++;score+=10+Math.min(20,streak*2);document.getElementById("feedback").textContent="✅ बरोबर!"}
+ else{if(btn)btn.classList.add("wrong");document.querySelectorAll(".choice").forEach(b=>{if(b.textContent===right)b.classList.add("correct")});lives--;streak=0;document.getElementById("feedback").textContent=timed?"⏰ वेळ संपली! योग्य उत्तर: "+right:"❌ चुकीचे! योग्य उत्तर: "+right}
+ stats();setTimeout(()=>{i++;lives<=0?finish():show()},900)
+}
+function finish(){
+ clearInterval(timer);document.getElementById("game").classList.add("hidden");document.getElementById("result").classList.remove("hidden");
+ let newBest=score>best;if(newBest){best=score;localStorage.setItem("marathiBest",best);document.getElementById("best").textContent=best}
+ document.getElementById("finalScore").textContent=score+" गुण";document.getElementById("summary").innerHTML="बरोबर उत्तरे: <b>"+correct+"</b><br>"+(newBest?"🏆 नवीन Best Score!":"तुझा Best Score: "+best)
+}
+</script>
+</body>
+</html>
