@@ -2,153 +2,946 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GameZone</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#05070d">
+<title>GameZone — Free Games</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
-:root{--bg:#05070d;--panel:#0b1020;--panel2:#10172a;--text:#f8fbff;--muted:#8b98ad;--cyan:#00e5ff;--blue:#287bff;--purple:#9b5cff;--pink:#ff3cac;--green:#21e58a;--line:rgba(255,255,255,.1)}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;color:var(--text);font-family:Inter,system-ui,sans-serif;background:#05070d;overflow-x:hidden}
-body:before{content:"";position:fixed;inset:-30%;z-index:-3;background:radial-gradient(circle at 20% 20%,rgba(0,229,255,.16),transparent 24%),radial-gradient(circle at 80% 15%,rgba(155,92,255,.18),transparent 25%),radial-gradient(circle at 50% 90%,rgba(255,60,172,.10),transparent 28%);animation:aurora 12s ease-in-out infinite alternate}
-body:after{content:"";position:fixed;inset:0;z-index:-2;opacity:.28;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:55px 55px;mask-image:linear-gradient(to bottom,black,transparent 90%)}
+
+:root{
+  --bg:#05070d;--panel:#0b1020;--panel2:#10172a;--text:#f8fbff;
+  --muted:#8b98ad;--cyan:#00e5ff;--blue:#287bff;--purple:#9b5cff;
+  --pink:#ff3cac;--green:#21e58a;--yellow:#ffd76a;--line:rgba(255,255,255,.1)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;color:var(--text);font-family:Inter,system-ui,sans-serif;
+  background:#05070d;overflow-x:hidden
+}
+body:before{
+  content:"";position:fixed;inset:-30%;z-index:-3;
+  background:
+  radial-gradient(circle at 20% 20%,rgba(0,229,255,.16),transparent 24%),
+  radial-gradient(circle at 80% 15%,rgba(155,92,255,.18),transparent 25%),
+  radial-gradient(circle at 50% 90%,rgba(255,60,172,.10),transparent 28%);
+  animation:aurora 12s ease-in-out infinite alternate
+}
+body:after{
+  content:"";position:fixed;inset:0;z-index:-2;opacity:.28;
+  background-image:
+  linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:55px 55px;
+  mask-image:linear-gradient(to bottom,black,transparent 90%)
+}
 @keyframes aurora{to{transform:translate(3%,2%) scale(1.08)}}
-header{position:sticky;top:0;z-index:100;min-height:76px;padding:14px clamp(16px,4vw,60px);display:flex;align-items:center;justify-content:space-between;background:rgba(5,7,13,.72);border-bottom:1px solid rgba(255,255,255,.09);backdrop-filter:blur(24px);box-shadow:0 12px 50px rgba(0,0,0,.35)}
-.logo{font-family:Orbitron,sans-serif;font-size:25px;font-weight:900;letter-spacing:1px;display:flex;align-items:center;gap:9px}.logo:first-letter{filter:drop-shadow(0 0 12px var(--cyan))}.logo span{background:linear-gradient(90deg,#fff,var(--cyan),#8f7cff,var(--pink));background-size:250%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 5s linear infinite}@keyframes shine{to{background-position:250%}}
-nav{display:flex;gap:10px}button{border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:11px 16px;color:#fff;font-weight:800;cursor:pointer;transition:.2s;box-shadow:0 8px 25px rgba(0,0,0,.2)}button:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.35)}button:active{transform:scale(.97)}
-.blue{background:linear-gradient(135deg,#087cff,#3157ff)}.purple{background:linear-gradient(135deg,#783dff,#c13cff)}.green{background:linear-gradient(135deg,#00a96b,#20e58a);color:#03120c}.gray{background:#202a3d}.red{background:linear-gradient(135deg,#e51c4d,#ff405f)}
-.hero{position:relative;max-width:1250px;margin:0 auto;padding:95px 24px 58px;text-align:center}.hero:before{content:"";position:absolute;left:50%;top:35px;width:430px;height:180px;transform:translateX(-50%);background:linear-gradient(90deg,rgba(0,229,255,.18),rgba(155,92,255,.18),rgba(255,60,172,.12));filter:blur(55px);z-index:-1}.hero h1{margin:0;font-family:Orbitron,sans-serif;font-size:clamp(48px,9vw,105px);font-weight:900;line-height:.95;letter-spacing:-3px;background:linear-gradient(100deg,#fff 15%,#00e5ff 42%,#9275ff 68%,#ff58b8);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 50px rgba(0,229,255,.12)}.hero p{margin:23px 0 0;color:#aab6c9;font-size:17px;letter-spacing:.4px}
-.search{max-width:850px;margin:0 auto 42px;padding:0 22px;position:relative}.search:before{content:"⌕";position:absolute;left:42px;top:50%;transform:translateY(-52%);font-size:23px;color:#00e5ff;z-index:2}.search input{width:100%;height:58px;padding:0 20px 0 52px;border-radius:17px;border:1px solid rgba(0,229,255,.2);background:rgba(11,16,32,.78);color:#fff;font-size:16px;outline:none;box-shadow:0 20px 55px rgba(0,0,0,.3),inset 0 0 25px rgba(0,229,255,.025);transition:.25s}.search input:focus{border-color:rgba(0,229,255,.75);box-shadow:0 0 0 4px rgba(0,229,255,.08),0 20px 55px rgba(0,0,0,.4)}.search input::placeholder{color:#65738a}
-.container{max-width:1250px;margin:auto;padding:0 22px 90px}.heading{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:20px;padding:17px 20px;border:1px solid var(--line);border-radius:17px;background:linear-gradient(90deg,rgba(13,20,38,.9),rgba(13,18,33,.6));box-shadow:0 14px 40px rgba(0,0,0,.2)}.heading h2{margin:0;font-family:Orbitron,sans-serif;font-size:21px;letter-spacing:.5px}.count{padding:7px 12px;border-radius:999px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.18);color:#7eefff;font-size:12px;font-weight:800}
-.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:25px}.game{position:relative;overflow:hidden;border-radius:21px;background:linear-gradient(145deg,rgba(18,27,49,.95),rgba(7,11,22,.98));border:1px solid rgba(255,255,255,.09);box-shadow:0 16px 45px rgba(0,0,0,.35);transition:transform .3s,box-shadow .3s,border-color .3s}.game:before{content:"";position:absolute;inset:-1px;z-index:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,rgba(0,229,255,.35),transparent 35%,rgba(155,92,255,.3),transparent 70%,rgba(255,60,172,.22));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.35}.game:hover{transform:translateY(-10px) scale(1.015);border-color:rgba(0,229,255,.35);box-shadow:0 25px 65px rgba(0,0,0,.5),0 0 35px rgba(0,229,255,.08)}
-.game-image{height:190px;background:linear-gradient(135deg,#080d19,#121b31);cursor:pointer;overflow:hidden;position:relative}.game-image:before{content:"GAME";position:absolute;left:13px;top:12px;z-index:2;padding:5px 8px;border-radius:7px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.16);font:800 9px Orbitron,sans-serif;letter-spacing:1px;color:#bdefff;backdrop-filter:blur(7px)}.game-image:after{content:"▶  PLAY NOW";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) translateY(8px);opacity:0;padding:12px 17px;border-radius:999px;background:rgba(4,8,18,.82);border:1px solid rgba(0,229,255,.55);color:#fff;font:800 11px Orbitron,sans-serif;letter-spacing:1px;transition:.25s;box-shadow:0 0 28px rgba(0,229,255,.18);backdrop-filter:blur(9px)}.game:hover .game-image:after{opacity:1;transform:translate(-50%,-50%) translateY(0)}.game-image img{width:100%;height:100%;object-fit:cover;display:block;transition:.5s;filter:saturate(.95)}.game:hover .game-image img{transform:scale(1.09);filter:saturate(1.25) contrast(1.05) brightness(1.05)}
-.info{position:relative;padding:18px 18px 20px}.name{font-family:Orbitron,sans-serif;font-size:16px;font-weight:800;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.name:after{content:"  →";color:#00e5ff}.by{margin-top:9px;color:#66758d;font-size:11px}.by:before{content:"●  ";color:#21e58a}.empty{display:none;text-align:center;padding:90px 20px;color:#718096;border:1px dashed rgba(0,229,255,.2);border-radius:20px;background:rgba(8,13,26,.55)}.status{text-align:center;margin:16px;color:#55f0b1;min-height:20px;font-weight:700}
-.modal{display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;background:rgba(0,0,0,.78);padding:20px;backdrop-filter:blur(13px);animation:fade .2s}@keyframes fade{from{opacity:0}to{opacity:1}}.box{position:relative;width:min(520px,100%);max-height:90vh;overflow:auto;padding:31px;border-radius:25px;background:linear-gradient(145deg,#111a30,#080d19);border:1px solid rgba(0,229,255,.18);box-shadow:0 35px 100px rgba(0,0,0,.65),0 0 50px rgba(0,229,255,.06)}.box:before{content:"";position:absolute;left:25px;right:25px;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),var(--purple),transparent);box-shadow:0 0 18px var(--cyan)}.box h2{margin:0 0 22px;font-family:Orbitron,sans-serif}.field{margin:17px 0}.field label{display:block;font-weight:800;margin-bottom:8px;color:#dce7f5;font-size:13px}.field input{width:100%;padding:14px;border-radius:12px;border:1px solid #2b3b55;background:#050a14;color:#fff;outline:none}.field input:focus{border-color:#00e5ff;box-shadow:0 0 0 3px rgba(0,229,255,.08)}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:23px}.admin-game{background:#050a14;padding:15px;margin-top:11px;border-radius:13px;border:1px solid rgba(255,255,255,.08)}.admin-game small{display:block;color:#697991;margin:5px 0 10px}hr{border:0;border-top:1px solid rgba(255,255,255,.09);margin:25px 0}
-@media(max-width:700px){header{min-height:64px;padding:11px 13px}.logo{font-size:18px}nav{gap:5px}nav button{padding:9px 10px;font-size:11px}.hero{padding:65px 15px 38px}.hero h1{font-size:clamp(40px,15vw,70px);letter-spacing:-2px}.hero p{font-size:13px}.search{padding:0 13px;margin-bottom:28px}.search input{height:52px}.search:before{left:31px}.container{padding:0 13px 60px}.heading{padding:13px 14px}.heading h2{font-size:16px}.games{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.game{border-radius:15px}.game-image{height:135px}.info{padding:12px}.name{font-size:12px}.by{font-size:9px}.game-image:after{font-size:8px;padding:9px 11px}.box{padding:24px;border-radius:20px}}
+@keyframes shine{to{background-position:250%}}
+@keyframes float{50%{transform:translateY(-5px)}}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+header{
+  position:sticky;top:0;z-index:100;min-height:76px;padding:14px clamp(16px,4vw,60px);
+  display:flex;align-items:center;justify-content:space-between;
+  background:rgba(5,7,13,.72);border-bottom:1px solid rgba(255,255,255,.09);
+  backdrop-filter:blur(24px);box-shadow:0 12px 50px rgba(0,0,0,.35)
+}
+.logo{font-family:Orbitron,sans-serif;font-size:25px;font-weight:900;letter-spacing:1px;display:flex;align-items:center;gap:9px}
+.logo span{
+  background:linear-gradient(90deg,#fff,var(--cyan),#8f7cff,var(--pink));background-size:250%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 5s linear infinite
+}
+nav{display:flex;gap:10px;align-items:center}
+button{
+  border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:11px 16px;color:#fff;
+  font-weight:800;cursor:pointer;transition:.2s;box-shadow:0 8px 25px rgba(0,0,0,.2)
+}
+button:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(0,0,0,.35)}
+button:active{transform:scale(.97)}
+.blue{background:linear-gradient(135deg,#087cff,#3157ff)}
+.purple{background:linear-gradient(135deg,#783dff,#c13cff)}
+.green{background:linear-gradient(135deg,#00a96b,#20e58a);color:#03120c}
+.gray{background:#202a3d}
+.red{background:linear-gradient(135deg,#e51c4d,#ff405f)}
+.gold{background:linear-gradient(135deg,#d49b24,#ffe47b);color:#241700}
+
+.hero{position:relative;max-width:1250px;margin:0 auto;padding:88px 24px 40px;text-align:center}
+.hero:before{
+  content:"";position:absolute;left:50%;top:35px;width:430px;height:180px;transform:translateX(-50%);
+  background:linear-gradient(90deg,rgba(0,229,255,.18),rgba(155,92,255,.18),rgba(255,60,172,.12));
+  filter:blur(55px);z-index:-1
+}
+.hero h1{
+  margin:0;font-family:Orbitron,sans-serif;font-size:clamp(48px,9vw,105px);font-weight:900;
+  line-height:.95;letter-spacing:-3px;background:linear-gradient(100deg,#fff 15%,#00e5ff 42%,#9275ff 68%,#ff58b8);
+  -webkit-background-clip:text;background-clip:text;color:transparent
+}
+.hero p{margin:23px 0 0;color:#aab6c9;font-size:17px;letter-spacing:.4px}
+.hero-badges{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:25px}
+.badge{
+  padding:8px 12px;border-radius:999px;background:rgba(0,229,255,.07);
+  border:1px solid rgba(0,229,255,.18);color:#9befff;font-size:11px;font-weight:800
+}
+
+.search{max-width:900px;margin:0 auto 20px;padding:0 22px;position:relative}
+.search:before{content:"⌕";position:absolute;left:42px;top:50%;transform:translateY(-52%);font-size:23px;color:#00e5ff;z-index:2}
+.search input{
+  width:100%;height:58px;padding:0 20px 0 52px;border-radius:17px;border:1px solid rgba(0,229,255,.2);
+  background:rgba(11,16,32,.78);color:#fff;font-size:16px;outline:none;
+  box-shadow:0 20px 55px rgba(0,0,0,.3),inset 0 0 25px rgba(0,229,255,.025);transition:.25s
+}
+.search input:focus{border-color:rgba(0,229,255,.75);box-shadow:0 0 0 4px rgba(0,229,255,.08),0 20px 55px rgba(0,0,0,.4)}
+.search input::placeholder{color:#65738a}
+
+.controls{
+  max-width:1250px;margin:0 auto 22px;padding:0 22px;display:flex;gap:10px;
+  align-items:center;justify-content:space-between;flex-wrap:wrap
+}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.filter{
+  background:#0e1729;color:#9eabc0;border:1px solid rgba(255,255,255,.09);
+  padding:9px 13px;font-size:11px;border-radius:999px;box-shadow:none
+}
+.filter.active{background:rgba(0,229,255,.11);border-color:rgba(0,229,255,.45);color:#7eefff}
+.sort{
+  background:#0e1729;color:#d8e1ef;border:1px solid rgba(255,255,255,.1);
+  padding:9px 12px;border-radius:10px;outline:none
+}
+
+.container{max-width:1250px;margin:auto;padding:0 22px 90px}
+.quick-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:25px}
+.stat{
+  padding:17px 18px;border:1px solid var(--line);border-radius:17px;
+  background:linear-gradient(145deg,rgba(13,20,38,.88),rgba(8,12,23,.72))
+}
+.stat strong{display:block;font-family:Orbitron,sans-serif;font-size:20px}
+.stat span{display:block;color:#718096;font-size:10px;margin-top:5px;text-transform:uppercase;letter-spacing:1px}
+
+.section-title{
+  display:flex;align-items:center;justify-content:space-between;gap:15px;margin:28px 0 16px;
+  padding:17px 20px;border:1px solid var(--line);border-radius:17px;
+  background:linear-gradient(90deg,rgba(13,20,38,.9),rgba(13,18,33,.6));
+  box-shadow:0 14px 40px rgba(0,0,0,.2)
+}
+.section-title h2{margin:0;font-family:Orbitron,sans-serif;font-size:21px;letter-spacing:.5px}
+.count{padding:7px 12px;border-radius:999px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.18);color:#7eefff;font-size:12px;font-weight:800}
+
+.featured{
+  display:grid;grid-template-columns:minmax(0,1.35fr) minmax(260px,.65fr);gap:18px;margin-bottom:26px
+}
+.feature-main{
+  min-height:260px;border-radius:23px;overflow:hidden;position:relative;
+  border:1px solid rgba(0,229,255,.2);background:#09101e;cursor:pointer;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);animation:float 7s ease-in-out infinite
+}
+.feature-main img{width:100%;height:100%;min-height:260px;object-fit:cover;display:block;filter:saturate(1.05)}
+.feature-main:after{
+  content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,7,15,.88),rgba(3,7,15,.22),rgba(3,7,15,.1))
+}
+.feature-copy{position:absolute;z-index:2;left:25px;bottom:24px;max-width:70%}
+.feature-copy small{color:#7eefff;font-weight:900;letter-spacing:2px}
+.feature-copy h3{font-family:Orbitron,sans-serif;font-size:clamp(23px,4vw,39px);margin:7px 0}
+.feature-copy p{color:#b6c1d2;margin:0;font-size:13px}
+.feature-play{
+  display:inline-block;margin-top:15px;padding:10px 15px;border-radius:10px;
+  background:linear-gradient(135deg,#087cff,#9b5cff);font-weight:900;font-size:11px
+}
+.feature-side{
+  display:grid;gap:12px
+}
+.mini{
+  display:flex;gap:12px;align-items:center;padding:12px;border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);background:rgba(10,16,30,.85);cursor:pointer;transition:.2s
+}
+.mini:hover{transform:translateX(4px);border-color:rgba(0,229,255,.3)}
+.mini img{width:80px;height:68px;border-radius:11px;object-fit:cover}
+.mini strong{display:block;font-size:13px}
+.mini span{display:block;color:#6f7e94;font-size:10px;margin-top:5px}
+
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:25px}
+.game{
+  position:relative;overflow:hidden;border-radius:21px;background:linear-gradient(145deg,rgba(18,27,49,.95),rgba(7,11,22,.98));
+  border:1px solid rgba(255,255,255,.09);box-shadow:0 16px 45px rgba(0,0,0,.35);
+  transition:transform .3s,box-shadow .3s,border-color .3s;animation:fade .35s both
+}
+.game:hover{transform:translateY(-10px) scale(1.015);border-color:rgba(0,229,255,.35);box-shadow:0 25px 65px rgba(0,0,0,.5),0 0 35px rgba(0,229,255,.08)}
+.game-image{height:190px;background:linear-gradient(135deg,#080d19,#121b31);cursor:pointer;overflow:hidden;position:relative}
+.game-image:before{
+  content:"GAME";position:absolute;left:13px;top:12px;z-index:2;padding:5px 8px;border-radius:7px;
+  background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.16);
+  font:800 9px Orbitron,sans-serif;letter-spacing:1px;color:#bdefff;backdrop-filter:blur(7px)
+}
+.game-image:after{
+  content:"▶  PLAY NOW";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) translateY(8px);
+  opacity:0;padding:12px 17px;border-radius:999px;background:rgba(4,8,18,.82);
+  border:1px solid rgba(0,229,255,.55);color:#fff;font:800 11px Orbitron,sans-serif;letter-spacing:1px;
+  transition:.25s;box-shadow:0 0 28px rgba(0,229,255,.18);backdrop-filter:blur(9px)
+}
+.game:hover .game-image:after{opacity:1;transform:translate(-50%,-50%)}
+.game-image img{width:100%;height:100%;object-fit:cover;display:block;transition:.5s}
+.game:hover .game-image img{transform:scale(1.09);filter:saturate(1.25) contrast(1.05) brightness(1.05)}
+.info{position:relative;padding:18px 18px 20px}
+.name{font-family:Orbitron,sans-serif;font-size:16px;font-weight:800;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.name:after{content:"  →";color:#00e5ff}
+.by{margin-top:9px;color:#66758d;font-size:11px}
+.by:before{content:"●  ";color:#21e58a}
+.card-meta{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:10px}
+.category-tag{
+  display:inline-block;padding:5px 8px;border-radius:999px;background:rgba(155,92,255,.08);
+  border:1px solid rgba(155,92,255,.2);color:#c6adff;font-size:9px;font-weight:800
+}
+.plays{font-size:10px;color:#8fa1ba}
+.rating{display:flex;align-items:center;gap:2px;margin-top:10px}
+.star{font-size:15px;color:#4b5870;cursor:pointer;transition:.15s}
+.star.active,.star:hover{color:#ffd45c}
+.rating-text{font-size:10px;color:#718096;margin-left:5px}
+.card-actions{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.favorite{
+  border:1px solid rgba(255,255,255,.12);background:#111a2c;color:#fff;border-radius:10px;
+  padding:7px 10px;box-shadow:none;font-size:15px
+}
+.favorite.active{color:#ff63bd;border-color:rgba(255,60,172,.55);background:rgba(255,60,172,.1)}
+.play-small{
+  border:1px solid rgba(0,229,255,.2);background:rgba(0,229,255,.07);
+  color:#83efff;padding:7px 10px;border-radius:9px;font-size:10px;box-shadow:none
+}
+.empty{
+  display:none;text-align:center;padding:90px 20px;color:#718096;border:1px dashed rgba(0,229,255,.2);
+  border-radius:20px;background:rgba(8,13,26,.55)
+}
+.status{text-align:center;margin:16px;color:#55f0b1;min-height:20px;font-weight:700}
+
+.modal{
+  display:none;position:fixed;inset:0;z-index:200;align-items:center;justify-content:center;
+  background:rgba(0,0,0,.78);padding:20px;backdrop-filter:blur(13px)
+}
+.box{
+  position:relative;width:min(560px,100%);max-height:90vh;overflow:auto;padding:31px;border-radius:25px;
+  background:linear-gradient(145deg,#111a30,#080d19);border:1px solid rgba(0,229,255,.18);
+  box-shadow:0 35px 100px rgba(0,0,0,.65),0 0 50px rgba(0,229,255,.06);animation:fade .2s
+}
+.box:before{
+  content:"";position:absolute;left:25px;right:25px;top:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),var(--purple),transparent);box-shadow:0 0 18px var(--cyan)
+}
+.box h2{margin:0 0 22px;font-family:Orbitron,sans-serif}
+.field{margin:17px 0}
+.field label{display:block;font-weight:800;margin-bottom:8px;color:#dce7f5;font-size:13px}
+.field input,.field select{
+  width:100%;padding:14px;border-radius:12px;border:1px solid #2b3b55;
+  background:#050a14;color:#fff;outline:none
+}
+.field input:focus,.field select:focus{border-color:#00e5ff;box-shadow:0 0 0 3px rgba(0,229,255,.08)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:23px}
+.admin-game{
+  background:#050a14;padding:15px;margin-top:11px;border-radius:13px;border:1px solid rgba(255,255,255,.08)
+}
+.admin-game small{display:block;color:#697991;margin:5px 0 10px}
+.admin-row{display:flex;gap:8px;flex-wrap:wrap}
+.admin-row button{padding:8px 11px;font-size:11px}
+hr{border:0;border-top:1px solid rgba(255,255,255,.09);margin:25px 0}
+.modal-note{color:#718096;font-size:11px;line-height:1.6}
+.no-feature{padding:30px;border:1px dashed rgba(0,229,255,.2);border-radius:18px;color:#718096;text-align:center}
+
+@media(max-width:800px){
+  .featured{grid-template-columns:1fr}
+  .feature-side{grid-template-columns:1fr 1fr}
+}
+@media(max-width:700px){
+  header{min-height:64px;padding:11px 13px}
+  .logo{font-size:18px}
+  nav{gap:5px}
+  nav button{padding:9px 10px;font-size:11px}
+  .hero{padding:65px 15px 35px}
+  .hero h1{font-size:clamp(40px,15vw,70px);letter-spacing:-2px}
+  .hero p{font-size:13px}
+  .search{padding:0 13px;margin-bottom:15px}
+  .search input{height:52px}
+  .search:before{left:31px}
+  .controls{padding:0 13px}
+  .container{padding:0 13px 60px}
+  .quick-stats{gap:8px}
+  .stat{padding:13px 10px}
+  .stat strong{font-size:16px}
+  .stat span{font-size:8px}
+  .section-title{padding:13px 14px}
+  .section-title h2{font-size:16px}
+  .games{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .game{border-radius:15px}
+  .game-image{height:135px}
+  .info{padding:12px}
+  .name{font-size:12px}
+  .by{font-size:9px}
+  .game-image:after{font-size:8px;padding:9px 11px}
+  .feature-main{min-height:220px}
+  .feature-main img{min-height:220px}
+  .feature-copy{left:17px;bottom:17px;max-width:82%}
+  .feature-copy h3{font-size:23px}
+  .feature-side{grid-template-columns:1fr}
+  .box{padding:24px;border-radius:20px}
+}
 </style>
 </head>
+
 <body>
-<header><div class="logo">🎮 <span>GameZone</span></div><nav>
-<button class="green" onclick="openModal('userLogin')">👤 Login</button>
-<button class="purple" onclick="openModal('adminLogin')">🔐 Admin</button>
-</nav></header>
-<section class="hero"><h1>PLAY FREE.</h1><p>Play games uploaded to GameZone.</p></section>
-<div class="search"><input id="search" placeholder="🔎 Search games..." oninput="renderGames()"></div>
+<header>
+  <div class="logo">🎮 <span>GameZone</span></div>
+  <nav>
+    <button class="green" onclick="openModal('userLogin')">👤 Login</button>
+    <button class="purple" onclick="openModal('adminLogin')">🔐 Admin</button>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>PLAY FREE.</h1>
+  <p>Discover, favorite and play games uploaded to GameZone.</p>
+  <div class="hero-badges">
+    <span class="badge">⚡ INSTANT PLAY</span>
+    <span class="badge">🎮 FREE GAMES</span>
+    <span class="badge">⭐ RATE YOUR FAVORITES</span>
+  </div>
+</section>
+
+<div class="search">
+  <input id="search" placeholder="🔎 Search games..." oninput="renderGames()">
+</div>
+
+<div class="controls">
+  <div class="filters" id="filters">
+    <button class="filter active" data-cat="All" onclick="setCategory('All')">All</button>
+    <button class="filter" data-cat="Arcade" onclick="setCategory('Arcade')">Arcade</button>
+    <button class="filter" data-cat="Action" onclick="setCategory('Action')">Action</button>
+    <button class="filter" data-cat="Puzzle" onclick="setCategory('Puzzle')">Puzzle</button>
+    <button class="filter" data-cat="Racing" onclick="setCategory('Racing')">Racing</button>
+    <button class="filter" data-cat="Other" onclick="setCategory('Other')">Other</button>
+    <button class="filter" id="favFilter" onclick="toggleFavoritesFilter()">♥ Favorites</button>
+  </div>
+  <select class="sort" id="sort" onchange="renderGames()">
+    <option value="newest">Newest</option>
+    <option value="popular">Most Played</option>
+    <option value="rating">Top Rated</option>
+    <option value="az">A → Z</option>
+  </select>
+</div>
+
 <div class="status" id="status"></div>
+
 <main class="container">
-<div class="heading"><h2>🎮 All Games</h2><span class="count" id="count">0 games</span></div><br>
-<div id="games" class="games"></div><div id="empty" class="empty">🎮<br><br>No games have been uploaded yet.</div>
+  <div class="quick-stats">
+    <div class="stat"><strong id="totalGames">0</strong><span>Total Games</span></div>
+    <div class="stat"><strong id="totalPlays">0</strong><span>Total Plays</span></div>
+    <div class="stat"><strong id="topGame">—</strong><span>Most Played</span></div>
+  </div>
+
+  <div class="section-title">
+    <h2>🔥 Featured Games</h2>
+    <span class="count" id="featuredCount">0</span>
+  </div>
+  <section class="featured" id="featured"></section>
+
+  <div class="section-title">
+    <h2>🎮 All Games</h2>
+    <span class="count" id="count">0 games</span>
+  </div>
+  <div id="games" class="games"></div>
+  <div id="empty" class="empty">🎮<br><br>No games match your search.</div>
 </main>
 
-<div class="modal" id="userLogin"><div class="box"><h2>👤 User Login</h2>
-<div class="field"><label>Username</label><input id="username"></div>
-<div class="field"><label>Password</label><input id="password" type="password"></div>
-<div class="actions"><button class="blue" onclick="userLogin()">Login</button><button class="gray" onclick="closeModal('userLogin')">Cancel</button></div>
-</div></div>
+<!-- User login -->
+<div class="modal" id="userLogin">
+  <div class="box">
+    <h2>👤 Player Login</h2>
+    <div class="field"><label>Username</label><input id="username" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input id="password" type="password" autocomplete="current-password"></div>
+    <div class="actions">
+      <button class="blue" onclick="userLogin()">Login</button>
+      <button class="gray" onclick="closeModal('userLogin')">Cancel</button>
+    </div>
+    <p class="modal-note">Player login is used for the upload area in this version.</p>
+  </div>
+</div>
 
-<div class="modal" id="adminLogin"><div class="box"><h2>🔐 Admin Panel</h2>
-<div class="field"><label>Admin Code</label><input id="adminCode" type="password"></div>
-<div class="actions"><button class="purple" onclick="adminLogin()">Unlock</button><button class="gray" onclick="closeModal('adminLogin')">Cancel</button></div>
-</div></div>
+<!-- Admin login -->
+<div class="modal" id="adminLogin">
+  <div class="box">
+    <h2>🔐 Admin Access</h2>
+    <div class="field"><label>Admin Code</label><input id="adminCode" type="password"></div>
+    <div class="actions">
+      <button class="purple" onclick="adminLogin()">Unlock</button>
+      <button class="gray" onclick="closeModal('adminLogin')">Cancel</button>
+    </div>
+  </div>
+</div>
 
-<div class="modal" id="uploadPanel"><div class="box"><h2>➕ Add Game</h2>
-<div class="field"><label>Game Name</label><input id="userGameName" placeholder="Game name"></div>
-<div class="field"><label>Game Picture</label><input id="userGameImage" type="file" accept="image/*"></div>
-<div class="field"><label>Game File</label><input id="userGameFile" type="file" accept=".html,.htm"></div>
-<div class="actions"><button class="green" onclick="uploadUserGame()">Upload Game</button><button class="gray" onclick="closeModal('uploadPanel')">Close</button></div>
-</div></div>
+<!-- User upload -->
+<div class="modal" id="uploadPanel">
+  <div class="box">
+    <h2>➕ Upload a Game</h2>
+    <div class="field"><label>Game Name</label><input id="userGameName" placeholder="Game name"></div>
+    <div class="field"><label>Game Picture</label><input id="userGameImage" type="file" accept="image/*"></div>
+    <div class="field"><label>Game URL</label><input id="userGameURL" type="url" placeholder="https://example.com/game.html"></div>
+    <div class="actions">
+      <button class="green" onclick="uploadUserGame()">Upload Game</button>
+      <button class="gray" onclick="closeModal('uploadPanel')">Close</button>
+    </div>
+  </div>
+</div>
 
-<div class="modal" id="adminPanel"><div class="box"><h2>⚙️ Admin Panel</h2>
-<div class="field"><label>Game Name</label><input id="adminGameName" placeholder="Game name"></div>
-<div class="field"><label>Game Picture</label><input id="adminGameImage" type="file" accept="image/*"></div>
-<div class="field"><label>Game File</label><input id="adminGameFile" type="file" accept=".html,.htm"></div>
-<div class="actions"><button class="blue" onclick="uploadAdminGame()">➕ Add Game</button><button class="gray" onclick="closeModal('adminPanel')">Close</button></div>
-<hr><h3>🗑️ Manage Games</h3><div id="adminGames"></div>
-</div></div>
+<!-- Admin panel -->
+<div class="modal" id="adminPanel">
+  <div class="box">
+    <h2>⚙️ GameZone Admin</h2>
+    <div class="field"><label>Game Name</label><input id="adminGameName" placeholder="Game name"></div>
+    <div class="field"><label>Game Picture</label><input id="adminGameImage" type="file" accept="image/*"></div>
+    <div class="field"><label>Game URL</label><input id="adminGameURL" type="url" placeholder="https://example.com/game.html"></div>
+    <div class="actions">
+      <button class="blue" onclick="uploadAdminGame()">➕ Add Game</button>
+      <button class="gray" onclick="closeModal('adminPanel')">Close</button>
+    </div>
+    <hr>
+    <h3>🛠️ Manage Games</h3>
+    <div id="adminGames"></div>
+  </div>
+</div>
+
+<!-- Edit -->
+<div class="modal" id="editPanel">
+  <div class="box">
+    <h2>✏️ Edit Game</h2>
+    <input id="editGameId" type="hidden">
+    <div class="field"><label>Game Name</label><input id="editGameName" placeholder="Game name"></div>
+    <div class="field"><label>Game Picture</label><input id="editGameImage" type="file" accept="image/*"></div>
+    <div class="field"><label>Game URL</label><input id="editGameURL" type="url" placeholder="https://example.com/game.html"></div>
+    <small class="modal-note">Leave the picture empty to keep the current one. Enter a Game URL to change it.</small>
+    <div class="actions">
+      <button class="blue" onclick="saveEditedGame()">💾 Save Changes</button>
+      <button class="gray" onclick="closeModal('editPanel')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rating -->
+<div class="modal" id="ratingPanel">
+  <div class="box">
+    <h2>⭐ Rate Game</h2>
+    <div id="ratingGameName" style="font-weight:800;margin-bottom:15px"></div>
+    <div id="ratingStars" style="font-size:32px;display:flex;gap:7px"></div>
+    <p class="modal-note">Your rating is saved in this browser.</p>
+    <div class="actions"><button class="gray" onclick="closeModal('ratingPanel')">Close</button></div>
+  </div>
+</div>
 
 <script>
 const SUPABASE_URL="https://wrmqzkgfdffdyalkuxrk.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY="sb_publishable_YYPmntWwTY4WFf-e8qW28g_dhZvy7GR";
 const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
-const ADMIN_CODE="PARAM",USERNAME="PARAM1",PASSWORD="GOD";
-let games=[],loggedIn=false,adminMode=false;
+
+const ADMIN_CODE="PARAM";
+const USERNAME="PARAM1";
+const PASSWORD="GOD";
+
+let games=[];
+let loggedIn=false;
+let adminMode=false;
+let currentCategory="All";
+let favoritesOnly=false;
+let ratingGameId=null;
+
+const FAV_KEY="gamezone_favorites_v2";
+const LOCAL_PLAYS_KEY="gamezone_local_plays_v2";
+const RATINGS_KEY="gamezone_ratings_v2";
+
+function jsonGet(key,fallback){
+  try{return JSON.parse(localStorage.getItem(key)||JSON.stringify(fallback))}
+  catch{return fallback}
+}
+function getFavorites(){return jsonGet(FAV_KEY,[])}
+function getLocalPlays(){return jsonGet(LOCAL_PLAYS_KEY,{})}
+function getRatings(){return jsonGet(RATINGS_KEY,{})}
+
+function setStatus(message=""){
+  document.getElementById("status").textContent=message;
+}
+
+function categoryFor(game){
+  const n=(game.name||"").toLowerCase();
+  if(/racing|race|car|bike|drift|kart/.test(n)) return "Racing";
+  if(/2048|puzzle|word|match|memory|marathi|sudoku|chess/.test(n)) return "Puzzle";
+  if(/zombie|warrior|shooter|battle|space|fight|survivor|ninja|among/.test(n)) return "Action";
+  if(/arcade|snake|fruit|dino|flappy|catcher|runner|jump/.test(n)) return "Arcade";
+  return "Other";
+}
+
+function getPlayCount(game){
+  return Number(game.play_count||0)+Number(getLocalPlays()[String(game.id)]||0);
+}
+
+function getRating(game){
+  const r=getRatings()[String(game.id)];
+  return r?Number(r):0;
+}
+
+function totalPlays(){
+  return games.reduce((sum,g)=>sum+getPlayCount(g),0);
+}
+
+function escapeHTML(value){
+  return String(value??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
 
 async function loadGames(){
- const {data,error}=await supabaseClient.from("games").select("*").order("created_at",{ascending:false});
- if(error){console.error(error);document.getElementById("status").textContent="Could not load games: "+error.message;return}
- games=data||[];renderGames();renderAdminGames();
+  setStatus("Loading games...");
+  const {data,error}=await supabaseClient
+    .from("games").select("*").order("created_at",{ascending:false});
+
+  if(error){
+    console.error(error);
+    setStatus("Could not load games: "+error.message);
+    return;
+  }
+
+  games=data||[];
+  renderAll();
+  renderAdminGames();
+  setStatus("");
 }
+
+function renderAll(){
+  renderFeatured();
+  renderGames();
+  renderStats();
+}
+
+function renderStats(){
+  document.getElementById("totalGames").textContent=games.length;
+  document.getElementById("totalPlays").textContent=totalPlays().toLocaleString();
+
+  if(!games.length){
+    document.getElementById("topGame").textContent="—";
+    return;
+  }
+
+  const top=[...games].sort((a,b)=>getPlayCount(b)-getPlayCount(a))[0];
+  let name=top?.name||"—";
+  if(name.length>15) name=name.slice(0,14)+"…";
+  document.getElementById("topGame").textContent=name;
+}
+
+function renderFeatured(){
+  const box=document.getElementById("featured");
+  const list=[...games].sort((a,b)=>{
+    const scoreB=getPlayCount(b)*2+getRating(b)*20;
+    const scoreA=getPlayCount(a)*2+getRating(a)*20;
+    return scoreB-scoreA;
+  }).slice(0,3);
+
+  document.getElementById("featuredCount").textContent=list.length;
+  box.innerHTML="";
+
+  if(!list.length){
+    box.innerHTML='<div class="no-feature">Your featured games will appear here after you upload games.</div>';
+    return;
+  }
+
+  const main=list[0];
+  const mainEl=document.createElement("div");
+  mainEl.className="feature-main";
+  mainEl.onclick=()=>playGame(main);
+  mainEl.innerHTML=`
+    <img src="${escapeHTML(main.image_url)}" alt="${escapeHTML(main.name||"Game")}">
+    <div class="feature-copy">
+      <small>⭐ FEATURED GAME</small>
+      <h3>${escapeHTML(main.name||"Game")}</h3>
+      <p>${getPlayCount(main).toLocaleString()} plays • ${categoryFor(main)}</p>
+      <span class="feature-play">▶ PLAY NOW</span>
+    </div>`;
+  box.appendChild(mainEl);
+
+  const side=document.createElement("div");
+  side.className="feature-side";
+  list.slice(1).forEach(g=>{
+    const el=document.createElement("div");
+    el.className="mini";
+    el.onclick=()=>playGame(g);
+    el.innerHTML=`
+      <img src="${escapeHTML(g.image_url)}" alt="">
+      <div><strong>${escapeHTML(g.name||"Game")}</strong>
+      <span>▶ ${getPlayCount(g).toLocaleString()} plays • ${categoryFor(g)}</span></div>`;
+    side.appendChild(el);
+  });
+  box.appendChild(side);
+}
+
 function renderGames(){
- const q=document.getElementById("search").value.toLowerCase();
- const list=games.filter(g=>(g.name||"").toLowerCase().includes(q));
- document.getElementById("count").textContent=list.length+(list.length===1?" game":" games");
- const box=document.getElementById("games");box.innerHTML="";
- document.getElementById("empty").style.display=list.length?"none":"block";
- list.forEach(g=>{
-  const card=document.createElement("div");card.className="game";
-  const image=document.createElement("div");image.className="game-image";
-  const img=document.createElement("img");img.src=g.image_url;img.alt=g.name||"Game";image.appendChild(img);
-  const info=document.createElement("div");info.className="info";
-  const name=document.createElement("div");name.className="name";name.textContent=g.name||"Unnamed game";
-  const by=document.createElement("div");by.className="by";by.textContent="Added by "+(g.added_by||"User");
-  info.append(name,by);card.append(image,info);
-  image.onclick=()=>window.open(g.game_url,"_blank");name.onclick=()=>window.open(g.game_url,"_blank");
-  box.appendChild(card);
- });
+  const q=document.getElementById("search").value.trim().toLowerCase();
+  const sort=document.getElementById("sort").value;
+  const favs=getFavorites();
+
+  let list=games.filter(g=>{
+    const matchesSearch=(g.name||"").toLowerCase().includes(q);
+    const matchesCategory=currentCategory==="All"||categoryFor(g)===currentCategory;
+    const matchesFav=!favoritesOnly||favs.includes(String(g.id));
+    return matchesSearch&&matchesCategory&&matchesFav;
+  });
+
+  if(sort==="popular") list.sort((a,b)=>getPlayCount(b)-getPlayCount(a));
+  else if(sort==="rating") list.sort((a,b)=>getRating(b)-getRating(a));
+  else if(sort==="az") list.sort((a,b)=>(a.name||"").localeCompare(b.name||""));
+  else list.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0));
+
+  const count=document.getElementById("count");
+  count.textContent=list.length+(list.length===1?" game":" games");
+
+  const box=document.getElementById("games");
+  box.innerHTML="";
+  document.getElementById("empty").style.display=list.length?"none":"block";
+
+  list.forEach((g,index)=>{
+    const card=document.createElement("div");
+    card.className="game";
+    card.style.animationDelay=Math.min(index*35,300)+"ms";
+
+    const image=document.createElement("div");
+    image.className="game-image";
+    const img=document.createElement("img");
+    img.src=g.image_url||"";
+    img.alt=g.name||"Game";
+    img.onerror=()=>{img.style.opacity=".25"};
+    image.appendChild(img);
+
+    const info=document.createElement("div");
+    info.className="info";
+
+    const name=document.createElement("div");
+    name.className="name";
+    name.textContent=g.name||"Unnamed game";
+    name.title=g.name||"";
+    name.onclick=()=>playGame(g);
+
+    const by=document.createElement("div");
+    by.className="by";
+    by.textContent="Added by "+(g.added_by||"User");
+
+    const meta=document.createElement("div");
+    meta.className="card-meta";
+    meta.innerHTML=`
+      <span class="category-tag">${categoryFor(g)}</span>
+      <span class="plays">▶ ${getPlayCount(g).toLocaleString()}</span>`;
+
+    const rating=document.createElement("div");
+    rating.className="rating";
+    const current=getRating(g);
+    for(let i=1;i<=5;i++){
+      const star=document.createElement("span");
+      star.className="star"+(i<=current?" active":"");
+      star.textContent="★";
+      star.title="Rate "+i+" stars";
+      star.onclick=e=>{e.stopPropagation();openRating(g,i)};
+      rating.appendChild(star);
+    }
+    const ratingText=document.createElement("span");
+    ratingText.className="rating-text";
+    ratingText.textContent=current?current+"/5":"Rate";
+    rating.appendChild(ratingText);
+
+    const actions=document.createElement("div");
+    actions.className="card-actions";
+
+    const fav=document.createElement("button");
+    fav.className="favorite"+(favs.includes(String(g.id))?" active":"");
+    fav.textContent=favs.includes(String(g.id))?"♥":"♡";
+    fav.title=favs.includes(String(g.id))?"Remove from favorites":"Add to favorites";
+    fav.onclick=e=>{e.stopPropagation();toggleFavorite(g.id)};
+
+    const play=document.createElement("button");
+    play.className="play-small";
+    play.textContent="▶ PLAY";
+    play.onclick=e=>{e.stopPropagation();playGame(g)};
+
+    actions.append(fav,play);
+    info.append(name,by,meta,rating,actions);
+    card.append(image,info);
+
+    image.onclick=()=>playGame(g);
+    box.appendChild(card);
+  });
+
+  document.querySelectorAll(".filter").forEach(b=>{
+    if(b.dataset.cat)b.classList.toggle("active",b.dataset.cat===currentCategory);
+  });
+  document.getElementById("favFilter").classList.toggle("active",favoritesOnly);
 }
+
+function setCategory(category){
+  currentCategory=category;
+  favoritesOnly=false;
+  renderGames();
+}
+
+function toggleFavoritesFilter(){
+  favoritesOnly=!favoritesOnly;
+  if(favoritesOnly) currentCategory="All";
+  renderGames();
+}
+
+function toggleFavorite(id){
+  const a=getFavorites();
+  const key=String(id);
+  const i=a.indexOf(key);
+  if(i>=0)a.splice(i,1);
+  else a.push(key);
+  localStorage.setItem(FAV_KEY,JSON.stringify(a));
+  renderGames();
+}
+
+function openRating(game,forcedValue=null){
+  ratingGameId=game.id;
+  document.getElementById("ratingGameName").textContent=game.name||"Game";
+  const box=document.getElementById("ratingStars");
+  box.innerHTML="";
+  const current=getRating(game);
+
+  for(let i=1;i<=5;i++){
+    const s=document.createElement("span");
+    s.textContent="★";
+    s.style.cursor="pointer";
+    s.style.color=i<=current?"#ffd45c":"#4b5870";
+    s.onclick=()=>saveRating(i);
+    box.appendChild(s);
+  }
+  openModal("ratingPanel");
+  if(forcedValue) setTimeout(()=>saveRating(forcedValue),0);
+}
+
+function saveRating(value){
+  if(ratingGameId==null)return;
+  const ratings=getRatings();
+  ratings[String(ratingGameId)]=value;
+  localStorage.setItem(RATINGS_KEY,JSON.stringify(ratings));
+  closeModal("ratingPanel");
+  renderAll();
+}
+
+async function playGame(game){
+  const local=getLocalPlays();
+  const key=String(game.id);
+  local[key]=(Number(local[key])||0)+1;
+  localStorage.setItem(LOCAL_PLAYS_KEY,JSON.stringify(local));
+
+  try{
+    const next=Number(game.play_count||0)+1;
+    const r=await supabaseClient.from("games").update({play_count:next}).eq("id",game.id);
+    if(!r.error)game.play_count=next;
+  }catch(e){console.warn("Play count sync unavailable",e)}
+
+  renderAll();
+
+  if(game.game_url) window.open(game.game_url,"_blank");
+  else alert("This game does not have a playable URL yet.");
+}
+
 function userLogin(){
- if(document.getElementById("username").value===USERNAME&&document.getElementById("password").value===PASSWORD){
-  loggedIn=true;closeModal("userLogin");openModal("uploadPanel");
- }else alert("Wrong username or password.");
+  if(document.getElementById("username").value===USERNAME &&
+     document.getElementById("password").value===PASSWORD){
+    loggedIn=true;
+    closeModal("userLogin");
+    openModal("uploadPanel");
+  }else{
+    alert("Wrong username or password.");
+  }
 }
+
 function adminLogin(){
- if(document.getElementById("adminCode").value===ADMIN_CODE){
-  adminMode=true;closeModal("adminLogin");openModal("adminPanel");
- }else alert("Wrong admin code.");
+  if(document.getElementById("adminCode").value===ADMIN_CODE){
+    adminMode=true;
+    closeModal("adminLogin");
+    openModal("adminPanel");
+    renderAdminGames();
+  }else{
+    alert("Wrong admin code.");
+  }
 }
-async function uploadUserGame(){if(!loggedIn)return alert("Please login first.");await uploadGame("userGameName","userGameImage","userGameFile","User")}
-async function uploadAdminGame(){if(!adminMode)return alert("Admin access required.");await uploadGame("adminGameName","adminGameImage","adminGameFile","Admin")}
-async function uploadGame(nameID,imageID,fileID,addedBy){
- const name=document.getElementById(nameID).value.trim(),image=document.getElementById(imageID).files[0],gameFile=document.getElementById(fileID).files[0];
- if(!name||!image||!gameFile)return alert("Please enter the game name and select both files.");
- if(!/\.(html|htm)$/i.test(gameFile.name))return alert("Game file must be HTML.");
- document.getElementById("status").textContent="Uploading game...";
- const unique=Date.now()+"-"+Math.random().toString(36).substring(2);
- const imagePath=unique+"-"+image.name.replace(/\s+/g,"-"),gamePath=unique+"-"+gameFile.name.replace(/\s+/g,"-");
- let r=await supabaseClient.storage.from("game-images").upload(imagePath,image);
- if(r.error)return alert("Image upload failed: "+r.error.message);
- r=await supabaseClient.storage.from("game-files").upload(gamePath,gameFile);
- if(r.error)return alert("Game upload failed: "+r.error.message);
- const imageURL=supabaseClient.storage.from("game-images").getPublicUrl(imagePath).data.publicUrl;
- const gameURL=supabaseClient.storage.from("game-files").getPublicUrl(gamePath).data.publicUrl;
- r=await supabaseClient.from("games").insert({name,image_url:imageURL,game_url:gameURL,added_by:addedBy});
- if(r.error)return alert("Database error: "+r.error.message);
- alert("🎉 Game uploaded successfully!");
- document.getElementById(nameID).value="";document.getElementById(imageID).value="";document.getElementById(fileID).value="";
- closeModal(addedBy==="Admin"?"adminPanel":"uploadPanel");await loadGames();
+
+async function uploadUserGame(){
+  if(!loggedIn)return alert("Please login first.");
+  await uploadGame("userGameName","userGameImage","userGameURL","User");
 }
+
+async function uploadAdminGame(){
+  if(!adminMode)return alert("Admin access required.");
+  await uploadGame("adminGameName","adminGameImage","adminGameURL","Admin");
+}
+
+async function uploadGame(nameID,imageID,urlID,addedBy){
+  const name=document.getElementById(nameID).value.trim();
+  const image=document.getElementById(imageID).files[0];
+  const gameURL=document.getElementById(urlID).value.trim();
+
+  if(!name||!image||!gameURL)
+    return alert("Please enter the game name, select a picture, and enter the Game URL.");
+
+  try{
+    new URL(gameURL);
+  }catch{
+    return alert("Please enter a valid Game URL starting with http:// or https://");
+  }
+
+  setStatus("Uploading game picture...");
+
+  const imagePath=Date.now()+"-"+Math.random().toString(36).slice(2)+"-"+image.name.replace(/\s+/g,"-");
+
+  let r=await supabaseClient.storage.from("game-images").upload(imagePath,image);
+  if(r.error){
+    setStatus("");
+    return alert("Image upload failed: "+r.error.message);
+  }
+
+  const imageURL=supabaseClient.storage.from("game-images").getPublicUrl(imagePath).data.publicUrl;
+
+  r=await supabaseClient.from("games").insert({
+    name:name,
+    image_url:imageURL,
+    game_url:gameURL,
+    added_by:addedBy
+  });
+
+  if(r.error){
+    setStatus("");
+    await supabaseClient.storage.from("game-images").remove([imagePath]);
+    return alert("Database error: "+r.error.message);
+  }
+
+  document.getElementById(nameID).value="";
+  document.getElementById(imageID).value="";
+  document.getElementById(urlID).value="";
+
+  closeModal(addedBy==="Admin"?"adminPanel":"uploadPanel");
+  setStatus("🎉 Game added successfully!");
+  await loadGames();
+  setTimeout(()=>setStatus(""),3500);
+}
+
 function renderAdminGames(){
- const box=document.getElementById("adminGames");box.innerHTML="";
- games.forEach(g=>{
-  const item=document.createElement("div");item.className="admin-game";
-  const title=document.createElement("strong");title.textContent=g.name||"Unnamed game";
-  const small=document.createElement("small");small.textContent="Added by "+(g.added_by||"User");
-  const btn=document.createElement("button");btn.className="red";btn.textContent="🗑️ Delete";btn.onclick=()=>deleteGame(g);
-  item.append(title,small,btn);box.appendChild(item);
- });
+  const box=document.getElementById("adminGames");
+  if(!box)return;
+  box.innerHTML="";
+
+  if(!games.length){
+    box.innerHTML='<p class="modal-note">No games have been uploaded yet.</p>';
+    return;
+  }
+
+  games.forEach(g=>{
+    const item=document.createElement("div");
+    item.className="admin-game";
+
+    const title=document.createElement("strong");
+    title.textContent=g.name||"Unnamed game";
+
+    const small=document.createElement("small");
+    small.textContent="▶ "+getPlayCount(g).toLocaleString()+" plays • "+categoryFor(g);
+
+    const row=document.createElement("div");
+    row.className="admin-row";
+
+    const edit=document.createElement("button");
+    edit.className="blue";
+    edit.textContent="✏️ Edit";
+    edit.onclick=()=>openEditGame(g);
+
+    const del=document.createElement("button");
+    del.className="red";
+    del.textContent="🗑️ Delete";
+    del.onclick=()=>deleteGame(g);
+
+    row.append(edit,del);
+    item.append(title,small,row);
+    box.appendChild(item);
+  });
 }
+
+function openEditGame(g){
+  document.getElementById("editGameId").value=g.id;
+  document.getElementById("editGameName").value=g.name||"";
+  document.getElementById("editGameImage").value="";
+  document.getElementById("editGameURL").value=g.game_url||"";
+  openModal("editPanel");
+}
+
+async function saveEditedGame(){
+  if(!adminMode)return alert("Admin access required.");
+
+  const id=document.getElementById("editGameId").value;
+  const game=games.find(x=>String(x.id)===String(id));
+  if(!game)return alert("Game not found.");
+
+  const name=document.getElementById("editGameName").value.trim();
+  const image=document.getElementById("editGameImage").files[0];
+  const gameURL=document.getElementById("editGameURL").value.trim();
+
+  if(!name)return alert("Game name cannot be empty.");
+
+  try{
+    new URL(gameURL);
+  }catch{
+    return alert("Please enter a valid Game URL starting with http:// or https://");
+  }
+
+  const patch={name,game_url:gameURL};
+
+  if(image){
+    const p=Date.now()+"-"+Math.random().toString(36).slice(2)+"-"+image.name.replace(/\s+/g,"-");
+    const r=await supabaseClient.storage.from("game-images").upload(p,image);
+    if(r.error)return alert("New image upload failed: "+r.error.message);
+    patch.image_url=supabaseClient.storage.from("game-images").getPublicUrl(p).data.publicUrl;
+  }
+
+  const r=await supabaseClient.from("games").update(patch).eq("id",game.id);
+  if(r.error)return alert("Update failed: "+r.error.message);
+
+  closeModal("editPanel");
+  await loadGames();
+  alert("✅ Game updated!");
+}
+
 async function deleteGame(game){
- if(!adminMode)return alert("Admin access required.");
- if(!confirm('Delete "'+(game.name||"this game")+'"?'))return;
- let r=await supabaseClient.from("games").delete().eq("id",game.id);
- if(r.error)return alert("Delete failed: "+r.error.message);
- const ip=game.image_url?.split("/game-images/")[1],gp=game.game_url?.split("/game-files/")[1];
- if(ip)await supabaseClient.storage.from("game-images").remove([ip]);
- if(gp)await supabaseClient.storage.from("game-files").remove([gp]);
- await loadGames();alert("Game deleted.");
+  if(!adminMode)return alert("Admin access required.");
+  if(!confirm('Delete "'+(game.name||"this game")+'"?'))return;
+
+  let r=await supabaseClient.from("games").delete().eq("id",game.id);
+  if(r.error)return alert("Delete failed: "+r.error.message);
+
+  const ip=game.image_url?.split("/game-images/")[1];
+  const gp=game.game_url?.split("/game-files/")[1];
+
+  if(ip)await supabaseClient.storage.from("game-images").remove([ip]);
+  if(gp)await supabaseClient.storage.from("game-files").remove([gp]);
+
+  const favs=getFavorites().filter(x=>x!==String(game.id));
+  localStorage.setItem(FAV_KEY,JSON.stringify(favs));
+
+  await loadGames();
+  alert("Game deleted.");
 }
-function openModal(id){document.getElementById(id).style.display="flex"}
-function closeModal(id){document.getElementById(id).style.display="none"}
-window.onclick=e=>document.querySelectorAll(".modal").forEach(m=>{if(e.target===m)m.style.display="none"});
+
+function openModal(id){
+  const el=document.getElementById(id);
+  if(el)el.style.display="flex";
+}
+function closeModal(id){
+  const el=document.getElementById(id);
+  if(el)el.style.display="none";
+}
+window.addEventListener("click",e=>{
+  document.querySelectorAll(".modal").forEach(m=>{
+    if(e.target===m)m.style.display="none";
+  });
+});
+
 loadGames();
 </script>
 </body>
